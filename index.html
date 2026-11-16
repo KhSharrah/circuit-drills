@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f1e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Circuit Drills">
+<title>Circuit Drills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4f1e9; --card:#fffdf8; --ink:#1b2230; --muted:#5d6577; --line:#dcd5c4; --soft:#ece7da;
+  --accent:#b8501a; --blue:#1e4fa3; --good:#1d7548; --bad:#b3261e; --good-bg:#e5f1e9; --bad-bg:#f8e5e1;
+  --grid:rgba(30,79,163,.055);
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#14181f;--card:#1b2029;--ink:#e6e3da;--muted:#9aa2b2;--line:#323a48;--soft:#232a35;
+    --accent:#e98a4f;--blue:#7da5ee;--good:#5cc28d;--bad:#f0877c;--good-bg:#183327;--bad-bg:#3a1f1d;--grid:rgba(125,165,238,.05);}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;min-height:100vh}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+sub{font-size:.72em}
+/* header */
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;letter-spacing:-.01em;font-size:17px}
+.brand svg{width:34px;height:18px;color:var(--accent)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{text-decoration:none;padding:6px 11px;border-radius:7px;color:var(--muted);font-size:14px;font-weight:500}
+nav a .n{font-family:var(--mono);font-size:11.5px;margin-right:6px;opacity:.7}
+nav a:hover{background:var(--soft);color:var(--ink)}
+nav a.on{background:var(--ink);color:var(--paper)}
+main{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
+/* home */
+.hero{padding:26px 0 18px;max-width:780px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:500}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.12;letter-spacing:-.025em;margin:10px 0 14px}
+.lede{font-size:17px;color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:26px}
+.sec-card{display:flex;flex-direction:column;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;transition:transform .12s,border-color .12s}
+.sec-card:hover{transform:translateY(-2px);border-color:var(--ink)}
+.sec-card .num{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.sec-card h3{margin:6px 0 6px;font-size:19px;letter-spacing:-.01em}
+.sec-card p{margin:0 0 14px;color:var(--muted);font-size:14.5px;flex:1}
+.sec-card .meta{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.sec-card .meta b{color:var(--good);font-weight:600}
+.foot{color:var(--muted);font-size:14px;margin-top:22px;max-width:760px}
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+@media (max-width:920px){.layout{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+.side{position:sticky;top:70px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;max-height:calc(100vh - 90px);display:flex;flex-direction:column}
+@media (max-width:920px){.side{position:static;max-height:none}}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;background:none;border:0;padding:11px 8px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.badge{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--soft);font-family:var(--mono);font-size:11px;margin-left:4px}
+.panel{padding:16px 18px 20px;overflow:auto;font-size:14px}
+.panel h3{font-size:12px;font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin:18px 0 6px;font-weight:600}
+.panel h3:first-child{margin-top:0}
+.panel p{margin:4px 0}
+.panel ol{margin:4px 0;padding-left:20px}
+.panel li{margin:3px 0}
+.math{font-family:var(--mono);font-size:13.5px;background:var(--soft);border-radius:7px;padding:9px 11px;margin:6px 0;white-space:pre-wrap;line-height:1.65;overflow-x:auto}
+.pt{width:100%;border-collapse:collapse;font-size:13.5px}
+.pt td,.pt th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.pt th{font-size:12px;color:var(--muted);font-weight:600}
+.pt td:first-child{font-weight:600}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px;font-style:italic}
+/* session bar */
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.bar-l{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.crumb{font-weight:700;font-size:17px;letter-spacing:-.01em}
+.prog{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.bar-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.stat{font-family:var(--mono);font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 10px}
+.stat b{font-weight:600}
+.stat.warn{border-color:var(--bad);color:var(--bad)}
+.dots{display:flex;gap:5px;margin:0 0 14px}
+.dots span{height:5px;flex:1;max-width:60px;border-radius:3px;background:var(--line)}
+.dots span.cur{background:var(--ink)}
+.dots span.ok{background:var(--good)}
+.dots span.part{background:var(--accent)}
+/* question */
+.qh{display:flex;gap:10px;align-items:baseline;margin-bottom:12px;flex-wrap:wrap}
+.qn{font-family:var(--mono);font-weight:600;color:var(--accent)}
+.qt{font-weight:600}
+.diagram{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:14px;color:var(--ink)}
+.diagram svg{display:block;width:100%;height:auto;max-height:340px}
+.prompt p{margin:0 0 10px}
+.given{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.chip{font-family:var(--mono);font-size:13px;background:var(--soft);border-radius:6px;padding:3px 8px}
+.chip b{font-weight:600}
+.fields{margin-top:6px}
+.part-h{font-family:var(--mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.field{padding:11px 0;border-bottom:1px dashed var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.field>label{font-weight:500}
+.field .mk{grid-column:1/-1;font-size:13px;font-weight:600;min-height:0}
+.field .mk:empty{display:none}
+.inrow{display:flex;align-items:center;gap:8px}
+.inrow .u{font-family:var(--mono);font-size:14px;min-width:32px;color:var(--muted)}
+input[type=text]{width:130px;padding:7px 9px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper);font-family:var(--mono);font-size:14.5px}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 18%,transparent)}
+select{padding:7px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper);font-family:var(--mono);font-size:14px;cursor:pointer}
+.field.ok input,.field.ok select{border-color:var(--good);background:var(--good-bg)}
+.field.bad input,.field.bad select{border-color:var(--bad);background:var(--bad-bg)}
+.field.ok .mk{color:var(--good)} .field.bad .mk{color:var(--bad)}
+.field.eq{grid-template-columns:1fr}
+.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.term{display:inline-flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:9px;background:var(--card)}
+.term input{width:92px}
+.term .dotop{font-family:var(--mono);font-weight:600;padding:0 1px}
+.eqs{font-family:var(--mono);font-size:20px;font-weight:600}
+.actions{display:flex;gap:8px;align-items:center;margin-top:18px;flex-wrap:wrap}
+.spacer{flex:1}
+.btn{border-radius:8px;padding:9px 15px;font-weight:600;font-size:14.5px;cursor:pointer;border:1.5px solid var(--ink);background:transparent}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn.ghost{border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.fb{margin-top:14px;padding:10px 13px;border-radius:8px;font-size:14.5px}
+.fb.ok{background:var(--good-bg);color:var(--good)}
+.fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb.info{background:var(--soft);color:var(--muted)}
+.solution{margin-top:16px;border-top:2px solid var(--ink);padding-top:12px}
+.solution h4{margin:14px 0 4px;font-size:15px}
+.solution h4:first-child{margin-top:4px}
+.solution p{margin:4px 0}
+.ans{color:var(--good);font-weight:600}
+/* hints */
+.hint{background:var(--soft);border-left:3px solid var(--accent);padding:9px 11px;border-radius:0 7px 7px 0;margin:0 0 10px}
+.hint .hn{font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:600;display:block;margin-bottom:2px}
+/* intro + summary */
+.intro h1{margin-top:6px}
+.intro .lede{font-size:16px}
+.what{margin:16px 0;padding-left:20px}
+.what li{margin:4px 0}
+.opt{display:flex;align-items:center;gap:12px;margin:12px 0;flex-wrap:wrap}
+.opt .ol{min-width:110px;font-weight:600;font-size:14px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:7px 13px;cursor:pointer;font-family:var(--mono);font-size:13.5px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.best{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:14px}
+.warnbox{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:14px;margin-top:14px}
+.big{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;margin:10px 0 4px}
+.big small{font-size:22px;color:var(--muted);font-weight:500}
+.sumstats{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+details.rev{border-top:1px solid var(--line);padding:10px 0}
+details.rev summary{cursor:pointer;display:flex;gap:12px;align-items:baseline;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev summary .sc{margin-left:auto;font-family:var(--mono);font-weight:600}
+details.rev summary .sc.full{color:var(--good)}
+details.rev summary .sc.zero{color:var(--bad)}
+details.rev .solution{border-top:0}
+/* svg */
+.circ{color:var(--ink)}
+.circ line,.circ polyline,.circ path.w,.circ circle.body{stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.circ .thick{stroke-width:3.4}
+.circ circle.src{stroke:currentColor;stroke-width:2;fill:var(--card)}
+.circ circle.term{stroke:currentColor;stroke-width:2;fill:var(--card)}
+.circ .dot{fill:currentColor}
+.circ text{font-family:var(--mono);font-size:13.5px;fill:currentColor}
+.circ text.nm{font-weight:600}
+.circ .val{fill:var(--accent);font-weight:500}
+.circ text.pol{font-size:17px;font-weight:700}
+.circ text.small{font-size:12px;fill:var(--muted)}
+.circ path.cur{stroke:var(--blue);stroke-width:2;fill:none}
+.circ text.curt{fill:var(--blue);font-weight:600;font-size:15px}
+.circ .ah{fill:currentColor}
+.circ .ahb{fill:var(--blue)}
+
+/* ---- phones ---- */
+.mob-bar{display:none}
+.swipe{display:none;font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+@media (max-width:920px){
+  .diagram{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .swipe{display:block}
+  nav{flex-wrap:nowrap;overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch}
+  nav a{white-space:nowrap}
+  .top-in{gap:8px;padding:8px 14px}
+  main{padding:16px 12px 110px}
+  .card{padding:16px}
+  input[type=text],select{font-size:16px}
+  input[type=text]{width:118px}
+  .term input{width:84px}
+  .field{grid-template-columns:1fr}
+  .btn{padding:11px 15px}
+  .q-layout .side{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;max-height:72vh;border-radius:16px 16px 0 0;
+    box-shadow:0 -10px 40px rgba(0,0,0,.25);transform:translateY(105%);transition:transform .22s ease;margin:0}
+  body.sheet-open .q-layout .side{transform:none}
+  .mob-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-top:1px solid var(--line)}
+  .mob-bar button{flex:1;border:1.5px solid var(--ink);background:var(--card);border-radius:10px;padding:11px;font-weight:600;font-size:15px}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:19;display:none}
+  body.sheet-open .scrim{display:block}
+  .sheet-close{display:block!important}
+}
+.sheet-close{display:none;margin-left:auto;background:none;border:0;font-size:22px;padding:6px 14px;cursor:pointer;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="#"><svg viewBox="0 0 34 18" aria-hidden="true"><polyline points="0,9 7,9 9,3 13,15 17,3 21,15 25,3 27,9 34,9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>Circuit Drills</a>
+  <nav id="nav"></nav>
+</div></header>
+<main id="app"></main>
+
+<script>
+/* ============ number + unit helpers ============ */
+const PNAME={9:'G',6:'M',3:'k',0:'',[-3]:'m',[-6]:'µ',[-9]:'n',[-12]:'p'};
+const PWORD={9:'giga',6:'mega',3:'kilo',0:'(none)',[-3]:'milli',[-6]:'micro',[-9]:'nano',[-12]:'pico'};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const E12=[1,1.2,1.5,1.8,2.2,2.7,3.3,3.9,4.7,5.6,6.8,8.2];
+function eVals(lo,hi){const o=[];for(let k=-1;k<=8;k++)for(const m of E12){const v=+(m*10**k).toPrecision(3);if(v>=lo*0.999&&v<=hi*1.001)o.push(v);}return o;}
+const rRes=(lo,hi)=>pick(eVals(lo,hi));
+function fmt(x,sig=4){
+  if(!isFinite(x))return '—';
+  if(Math.abs(x)<1e-15)return '0';
+  const a=Math.abs(x);let s;
+  if(a>=1e-4&&a<1e7){s=String(Number(x.toPrecision(sig)));if(/e/.test(s))s=Number(x.toPrecision(sig)).toFixed(12).replace(/0+$/,'').replace(/\.$/,'');}
+  else{const [m,e]=x.toExponential(sig-1).split('e');s=`${parseFloat(m)} × 10<sup>${+e}</sup>`;}
+  return s.replace(/-/g,'−');
+}
+const withUnit=(v,u,e,sig=4)=>`${fmt(v/10**e,sig)} ${PNAME[e]}${u}`;
+function natExp(v,exps){const a=Math.abs(v);for(const e of exps){if(a>=10**e*0.9995)return e;}return exps[exps.length-1];}
+const nat=(v,u,exps,sig=4)=>withUnit(v,u,natExp(v,exps),sig);
+const RE_=[6,3,0], VE_=[3,0,-3], IE_=[0,-3,-6,-9];
+function rep(v,u,exps,alt=0.25){
+  let e=natExp(v,exps);
+  if(Math.random()<alt){const o=exps.filter(x=>x!==e&&Math.abs(x-e)===3&&Math.abs(v)/10**x>=0.001&&Math.abs(v)/10**x<100000);if(o.length)e=pick(o);}
+  return withUnit(v,u,e);
+}
+function ansUnit(v,exps=[0,-3,-6]){const ok=exps.filter(e=>{const d=Math.abs(v)/10**e;return d>=0.01&&d<10000;});return ok.length?pick(ok):natExp(v,exps);}
+function parseNum(s){
+  if(s==null)return NaN;
+  s=String(s).trim().replace(/[−–]/g,'-').replace(/\s+/g,'');
+  if(!s.includes('.')&&/^[-+]?\d*,\d+$/.test(s))s=s.replace(',','.');
+  s=s.replace(/×10\^?/i,'e').replace(/\*10\^/,'e');
+  if(!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s))return NaN;
+  return parseFloat(s);
+}
+const close=(x,t,rel=0.02,abs=0)=>Math.abs(x-t)<=Math.max(rel*Math.abs(t),abs);
+const sgn=s=>s>0?'+':'−';
+const uHTML=(e,u)=>`${PNAME[e]}${u}`;
+
+/* ============ SVG drawing helpers ============ */
+let UID=0;
+function svgHead(w,h,label){UID++;const id='mkx';return {id,
+  head:`<svg viewBox="0 0 ${w} ${h}" style="min-width:${Math.round(w*0.8)}px" class="circ" role="img" aria-label="${label}"><defs>
+  <marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+  <marker id="${id}b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="ahb"/></marker></defs>`};}
+const Ln=(x1,y1,x2,y2,cls='',extra='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${cls?` class="${cls}"`:''} ${extra}/>`;
+const Tx=(x,y,t,cls='',a='start')=>`<text x="${x}" y="${y}"${cls?` class="${cls}"`:''} text-anchor="${a}">${t}</text>`;
+const Poly=p=>`<polyline points="${p.map(q=>q.join(',')).join(' ')}"/>`;
+const Dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3.3"/>`;
+const nm=(b,s,rest='')=>`${b}<tspan dy="4" font-size="10.5">${s}</tspan><tspan dy="-4">${rest}</tspan>`;
+const lab2=(x,y,name,val,a)=>Tx(x,y-4,name,'nm',a)+Tx(x,y+13,val,'val',a);
+function resV(x,y1,y2,name,val,side='right'){
+  const m=(y1+y2)/2,len=40,n=6,w=7,a=m-len/2;const p=[[x,y1],[x,a]];
+  for(let i=0;i<n;i++)p.push([x+(i%2?-w:w),a+(i+.5)*len/n]);p.push([x,a+len],[x,y2]);
+  return Poly(p)+lab2(side==='right'?x+15:x-15,m,name,val,side==='right'?'start':'end');
+}
+function resH(x1,x2,y,name,val){
+  const m=(x1+x2)/2,len=40,n=6,w=7,a=m-len/2;const p=[[x1,y],[a,y]];
+  for(let i=0;i<n;i++)p.push([a+(i+.5)*len/n,y+(i%2?w:-w)]);p.push([a+len,y],[x2,y]);
+  return Poly(p)+Tx(m,y-17,`${name}<tspan class="val">${val}</tspan>`,'nm','middle');
+}
+function srcV(x,y1,y2,plusTop,name,val,side){
+  const m=(y1+y2)/2,r=18;
+  return Ln(x,y1,x,m-r)+Ln(x,m+r,x,y2)+`<circle class="src" cx="${x}" cy="${m}" r="${r}"/>`+
+    Tx(x,m-4,plusTop?'+':'−','pol','middle')+Tx(x,m+14,plusTop?'−':'+','pol','middle')+
+    lab2(side==='left'?x-28:x+28,m,name,val,side==='left'?'end':'start');
+}
+const Gnd=(x,y)=>Ln(x-13,y,x+13,y)+Ln(x-8,y+5,x+8,y+5)+Ln(x-3,y+10,x+3,y+10);
+function meshArrow(cx,cy,label,id){
+  const r=24,sx=cx+r*Math.cos(2.0944),sy=cy+r*Math.sin(2.0944),ex=cx+r*Math.cos(1.0472),ey=cy+r*Math.sin(1.0472);
+  return `<path class="cur" d="M${sx.toFixed(1)},${sy.toFixed(1)} A${r},${r} 0 1 1 ${ex.toFixed(1)},${ey.toFixed(1)}" marker-end="url(#${id}b)"/>`+
+    `<text x="${cx}" y="${cy+5}" class="curt" text-anchor="middle">${label}</text>`;
+}
+function npn(cx,cy,id){
+  return `<circle class="body" cx="${cx+12}" cy="${cy}" r="31"/>`+Ln(cx,cy-20,cx,cy+20,'thick')+
+    Ln(cx,cy-9,cx+24,cy-28)+Ln(cx+24,cy-28,cx+24,cy-50)+
+    Ln(cx,cy+9,cx+24,cy+28,'',`marker-end="url(#${id})"`)+Ln(cx+24,cy+28,cx+24,cy+50);
+}
+function nmos(cx,cy,id){
+  return `<circle class="body" cx="${cx+10}" cy="${cy}" r="31"/>`+Ln(cx-8,cy-17,cx-8,cy+17,'thick')+
+    Ln(cx,cy-21,cx,cy-10,'thick')+Ln(cx,cy-5,cx,cy+5,'thick')+Ln(cx,cy+10,cx,cy+21,'thick')+
+    Ln(cx,cy-15,cx+24,cy-15)+Ln(cx+24,cy-15,cx+24,cy-50)+
+    Ln(cx,cy+15,cx+24,cy+15)+Ln(cx+24,cy+15,cx+24,cy+50)+
+    Ln(cx+24,cy,cx+3,cy,'',`marker-end="url(#${id})"`)+Ln(cx+24,cy,cx+24,cy+15);
+}
+
+/* ============ Section 0: unit prefixes ============ */
+function rep2(v,u,exps,alt=0.25){
+  let e=natExp(v,exps);
+  if(Math.random()<alt){const o=exps.filter(x=>x!==e&&Math.abs(x-e)===3&&Math.abs(v)/10**x>=0.001&&Math.abs(v)/10**x<100000);if(o.length)e=pick(o);}
+  return {s:withUnit(v,u,e),e};
+}
+function eng(v,e){
+  if(v===0)return '0';
+  if(e===undefined)e=natExp(v,[9,6,3,0,-3,-6,-9,-12]);
+  return e===0?fmt(v):`${fmt(v/10**e)}×10<sup>${String(e).replace('-','−')}</sup>`;
+}
+function targetExp(v,exps){const ok=exps.filter(e=>e!==0&&Math.abs(v)/10**e>=0.01&&Math.abs(v)/10**e<10000);return ok.length?pick(ok):natExp(v,exps);}
+const BASEN={A:'amperes (A)',V:'volts (V)','Ω':'ohms (Ω)',W:'watts (W)',F:'farads (F)',Hz:'hertz (Hz)'};
+function genUnits(){
+  const kind=pick(['to','to','from','from','chain','chain','chain','chain','exp']);
+  const UL=[{u:'Ω',x:[6,3]},{u:'V',x:[3,-3,-6]},{u:'A',x:[-3,-6,-9]},{u:'W',x:[6,3,-3,-6]},{u:'F',x:[-3,-6,-9,-12]},{u:'Hz',x:[9,6,3]}];
+  const hints=[
+    `Every prefix is a power of ten (formula sheet). k = 10<sup>3</sup>, m = 10<sup>−3</sup>, µ = 10<sup>−6</sup>…`,
+    `<b>Prefix → base unit:</b> multiply by the prefix factor (4.7 kΩ = 4.7 × 10<sup>3</sup> Ω = 4700 Ω).<br><b>Base unit → prefix:</b> divide by the prefix factor (0.0025 A ÷ 10<sup>−3</sup> = 2.5 mA).`
+  ];
+  if(kind==='to'){
+    const U=pick(UL),e=pick(U.x),m=pick([1.5,2.2,4.7,33,56,120,330,470,680,0.82,0.15,10,250,3.9,6.8,1200]);const v=m*10**e;
+    return {kind:'Prefix → base unit',prompt:`<p>Convert <b>${fmt(m)} ${uHTML(e,U.u)}</b> to its base unit, ${BASEN[U.u]}.</p><p class="note">Very small or large answers can be typed in e-notation, e.g. 4.7e-6.</p>`,
+      fields:[{type:'num',k:'a',label:'Value in base unit',unit:U.u,ans:v,rel:0.005}],hints,
+      solution:`<h4>Worked solution</h4><p>${PNAME[e]} = 10<sup>${e}</sup>, so multiply by 10<sup>${e}</sup>:</p><div class="math">${fmt(m)} ${uHTML(e,U.u)} = ${fmt(m)} × 10^${e} ${U.u} = <span class="ans">${fmt(v,6)} ${U.u}</span></div>`};
+  }
+  if(kind==='from'){
+    let U,e,m,v;do{U=pick(UL);e=pick(U.x.filter(x=>Math.abs(x)<=6));m=pick([1.5,2.2,4.7,33,56,120,330,470,680,0.82,10,250,3.9,6.8]);v=m*10**e;}while(v<1e-4||v>=1e7);
+    return {kind:'Base unit → prefix',prompt:`<p>Express <b>${fmt(v,6)} ${U.u}</b> in <b>${uHTML(e,U.u)}</b>.</p>`,
+      fields:[{type:'num',k:'a',label:`Value in ${uHTML(e,U.u)}`,unit:uHTML(e,U.u),ans:m,rel:0.005}],hints,
+      solution:`<h4>Worked solution</h4><p>${PNAME[e]} = 10<sup>${e}</sup>, so divide by 10<sup>${e}</sup>:</p><div class="math">${fmt(v,6)} ${U.u} ÷ 10^${e} = <span class="ans">${fmt(m)} ${uHTML(e,U.u)}</span></div>`};
+  }
+  if(kind==='exp'){
+    const e=pick([9,6,3,-3,-6,-9,-12]),u=pick(['A','V','Ω','F','W','Hz']);
+    return {kind:'Prefix values',prompt:`<p>Fill in the exponent: <b>1 ${PNAME[e]}${u} = 10<sup>?</sup> ${u}</b></p>`,
+      fields:[{type:'num',k:'a',label:'Exponent',unit:'',ans:e,rel:0,abs:0.01}],
+      hints:[`Kilo/mega/giga are positive powers of ten in steps of 3; milli/micro/nano/pico are negative, also in steps of 3.`],
+      solution:`<h4>Worked solution</h4><p>${PNAME[e]} = ${PWORD[e]} = 10<sup>${e}</sup>, so 1 ${PNAME[e]}${u} = 10<sup>${e}</sup> ${u}. Answer: <span class="ans">${fmt(e)}</span></p>`};
+  }
+  // chain: convert givens to base → formula → reconvert
+  const cv=pick(['I=V/R','I=V/R','V=IR','P=VI','P=I2R','P=V2/R']);
+  const RG=(ef)=>{const e=ef??pick([3,3,6]);const R=rRes(10**e,10**e*82);return {v:R,e,s:withUnit(R,'Ω',e),u:'Ω',n:'R'};};
+  const VG=()=>{const [m,e]=pick([[pick([1.5,3,5,9,12,24]),0],[pick([100,250,500,750]),-3],[pick([1,1.5,2,5]),3]]);return {v:m*10**e,e,s:`${fmt(m)} ${uHTML(e,'V')}`,u:'V',n:'V'};};
+  const IG=()=>{const [m,e]=pick([[pick([0.5,1,2,2.5,5,10,25,40]),-3],[pick([20,50,100,250,500]),-6]]);return {v:m*10**e,e,s:`${fmt(m)} ${uHTML(e,'A')}`,u:'A',n:'I'};};
+  let gv,res,rq,form,sent;
+  if(cv==='I=V/R'){const V=VG(),R=RG(V.e===3?pick([3,6]):undefined);gv=[V,R];res=V.v/R.v;rq={n:'I',u:'A',x:[-3,-6,-9,3]};form='I = V / R';sent=`A <b>${V.s}</b> source is connected across a <b>${R.s}</b> resistor. Find the current.`;}
+  else if(cv==='V=IR'){const I=IG(),R=RG(I.e===-3?3:pick([3,6]));gv=[I,R];res=I.v*R.v;rq={n:'V',u:'V',x:[3,-3,-6]};form='V = I × R';sent=`A current of <b>${I.s}</b> flows through a <b>${R.s}</b> resistor. Find the voltage across it.`;}
+  else if(cv==='P=VI'){const V=VG(),I=IG();gv=[V,I];res=V.v*I.v;rq={n:'P',u:'W',x:[3,-3,-6]};form='P = V × I';sent=`A component has <b>${V.s}</b> across it and carries <b>${I.s}</b>. Find the power it absorbs.`;}
+  else if(cv==='P=I2R'){const I=IG(),R=RG(I.e===-3?3:pick([3,6]));gv=[I,R];res=I.v*I.v*R.v;rq={n:'P',u:'W',x:[3,-3,-6]};form='P = I² × R';sent=`A current of <b>${I.s}</b> flows through a <b>${R.s}</b> resistor. Find the power dissipated.`;}
+  else{const V=VG(),R=RG();gv=[V,R];res=V.v*V.v/R.v;rq={n:'P',u:'W',x:[3,-3,-6]};form='P = V² / R';sent=`A <b>${V.s}</b> source is connected across a <b>${R.s}</b> resistor. Find the power dissipated.`;}
+  const te=targetExp(res,rq.x);
+  const fields=[{type:'h',text:'Step 1 — convert the givens to base units'}];
+  let sol=`<h4>Step 1 · Convert to base units</h4><div class="math">`;
+  gv.forEach((g,i)=>{if(g.e!==0){fields.push({type:'num',k:'g'+i,label:`${g.n} = ${g.s} in base units`,unit:g.u,ans:g.v,rel:0.01});sol+=`${g.n} = ${g.s} = ${fmt(g.v/10**g.e)} × 10^${g.e} = <span class="ans">${fmt(g.v,6)} ${g.u}</span>\n`;}
+    else sol+=`${g.n} = ${g.s} (already in base units)\n`;});
+  sol+=`</div><h4>Step 2 · Apply the formula (base units in → base unit out)</h4><div class="math">${form} = <span class="ans">${fmt(res,5)} ${rq.u}</span></div>
+<h4>Step 3 · Convert to the requested prefix</h4><div class="math">${fmt(res,5)} ${rq.u} ÷ 10^${te} = <span class="ans">${withUnit(res,rq.u,te)}</span></div>`;
+  fields.push({type:'h',text:'Step 2 — apply the formula'},{type:'num',k:'r',label:`${rq.n} using ${form}`,unit:rq.u,ans:res,rel:0.015},
+    {type:'h',text:'Step 3 — convert to the requested prefix'},{type:'num',k:'t',label:`${rq.n} in ${uHTML(te,rq.u)}`,unit:uHTML(te,rq.u),ans:res/10**te,rel:0.015});
+  return {kind:`Convert → calculate → reconvert (${form})`,prompt:`<p>${sent}</p><p class="note">Work in base units: convert the givens, calculate, then express the answer with the prefix asked for. Small numbers can be typed in e-notation, e.g. 2.5e-3.</p>`,
+    fields,solution:sol,hints:[hints[0],`Step 1: multiply each prefixed value by its prefix factor so everything is in A, V, Ω or W. Step 2: apply ${form} with those base-unit numbers; the answer comes out in ${rq.u}.`,hints[1]]};
+}
+
+
+/* ============ Section 1: mesh analysis ============ */
+function genMesh(){
+  for(let t=0;t<500;t++){
+    const [eV,eR]=pick([[0,0],[0,3],[0,3],[0,6],[3,3],[3,6]]);
+    const lo=eR===0?10:10**eR,hi=lo*82;
+    const R1=rRes(lo,hi),R2=rRes(lo,hi),R3=rRes(lo,hi);
+    const vl=eV===0?[3,5,6,9,10,12,15,18,20,24]:[500,1000,1500,2000,2500,3000,5000,6000,10000];
+    const V1=pick(vl),V2=pick(vl);
+    const p1=Math.random()<.5,p2=Math.random()<.5;
+    const s1=p1?1:-1,s2=p2?-1:1;
+    const b1=s1*V1,b2=s2*V2,a11=R1+R2,a22=R2+R3,D=a11*a22-R2*R2;
+    const I1=(b1*a22+R2*b2)/D,I2=(a11*b2+R2*b1)/D,IR=I1-I2;
+    const mg=[I1,I2,IR].map(Math.abs);if(Math.min(...mg)<0.06*Math.max(...mg))continue;
+    const d={R1:rep(R1,'Ω',RE_),R2:rep(R2,'Ω',RE_),R3:rep(R3,'Ω',RE_),V1:rep(V1,'V',VE_),V2:rep(V2,'V',VE_)};
+    const u1=ansUnit(I1),u2=ansUnit(I2),u3=ansUnit(IR);
+    // diagram
+    const {id,head}=svgHead(620,280,'Two-mesh circuit');const L=110,M=310,R=510,T=55,B=225;
+    let svg=head+srcV(L,T,B,p1,nm('V','1'),d.V1,'left')+resH(L,M,T,nm('R','1',' = '),d.R1)+resV(M,T,B,nm('R','2'),d.R2,'right')+
+      resH(M,R,T,nm('R','3',' = '),d.R3)+srcV(R,T,B,p2,nm('V','2'),d.V2,'right')+Ln(L,B,R,B)+Dot(M,T)+Dot(M,B)+
+      meshArrow(205,182,'I₁',id)+meshArrow(410,182,'I₂',id)+'</svg>';
+    const eRn=natExp(R2,RE_),k=10**eRn,ru=PNAME[eRn]+'Ω';
+    const sol=`
+<h4>1 · Mesh 1 — walk clockwise (up through V₁, right through R₁, down through R₂)</h4>
+<p>R₁ carries I₁. R₂ carries (I₁ − I₂) in the walking direction. V₁'s + terminal is at the <b>${p1?'top':'bottom'}</b>; walking up through it goes ${p1?'− → +, a <b>rise</b>':'+ → −, a <b>drop</b>'}, so the right-hand side is <b>${sgn(s1)}V₁</b>.</p>
+<div class="math">R₁·I₁ + R₂(I₁ − I₂) = ${sgn(s1)}V₁
+(R₁ + R₂)·I₁ − R₂·I₂ = ${sgn(s1)}V₁
+<span class="ans">(${nat(a11,'Ω',RE_)})·I₁ − (${nat(R2,'Ω',RE_)})·I₂ = ${sgn(s1)}${nat(V1,'V',VE_)}</span></div>
+<h4>2 · Mesh 2 — walk clockwise (up through R₂, right through R₃, down through V₂)</h4>
+<p>R₂ carries (I₂ − I₁) going up; R₃ carries I₂. V₂'s + terminal is at the <b>${p2?'top':'bottom'}</b>; walking down through it goes ${p2?'+ → −, a <b>drop</b>':'− → +, a <b>rise</b>'}, so the right-hand side is <b>${sgn(s2)}V₂</b>.</p>
+<div class="math">R₂(I₂ − I₁) + R₃·I₂ = ${sgn(s2)}V₂
+−R₂·I₁ + (R₂ + R₃)·I₂ = ${sgn(s2)}V₂
+<span class="ans">−(${nat(R2,'Ω',RE_)})·I₁ + (${nat(a22,'Ω',RE_)})·I₂ = ${sgn(s2)}${nat(V2,'V',VE_)}</span></div>
+<p class="note">Multiplying a whole equation by −1 is equally correct and is accepted.</p>
+<h4>3 · Solve with Cramer's rule (resistances in ${ru})</h4>
+<div class="math">Δ = (R₁+R₂)(R₂+R₃) − R₂² = ${fmt(a11/k)}×${fmt(a22/k)} − ${fmt(R2/k)}² = ${fmt(D/k/k)} ${ru}²
+I₁ = [(${sgn(s1)}V₁)(R₂+R₃) + R₂(${sgn(s2)}V₂)] / Δ = ${nat(I1,'A',IE_)} → <span class="ans">${withUnit(I1,'A',u1)}</span>
+I₂ = [(R₁+R₂)(${sgn(s2)}V₂) + R₂(${sgn(s1)}V₁)] / Δ = ${nat(I2,'A',IE_)} → <span class="ans">${withUnit(I2,'A',u2)}</span>
+I(R₂, downward) = I₁ − I₂ = <span class="ans">${withUnit(IR,'A',u3)}</span></div>
+<p>${I1<0||I2<0?'A negative mesh current just means that current actually circulates counter-clockwise.':'Both mesh currents came out positive, so they really do circulate clockwise.'} ${IR<0?'The R₂ current is negative, so it actually flows <i>upward</i>.':''}</p>`;
+    return {
+      kind:'Two-mesh circuit',svg,
+      prompt:`<p>Both mesh currents are defined <b>clockwise</b>, as drawn. Watch the source polarities. Part A: write each KVL mesh equation in collected form, combining resistances yourself. Part B: solve, giving currents <b>with their sign</b> in the unit asked.</p>`,
+      fields:[
+        {type:'h',text:'Part A — Mesh equations'},
+        {type:'eq',k:'e1',label:'Mesh 1 (left loop)',ans:{c1:a11,c2:-R2,b:b1},rdef:eR},
+        {type:'eq',k:'e2',label:'Mesh 2 (right loop)',ans:{c1:-R2,c2:a22,b:b2},rdef:eR},
+        {type:'h',text:'Part B — Solve'},
+        {type:'num',k:'i1',label:'Mesh current I<sub>1</sub>',unit:uHTML(u1,'A'),ans:I1/10**u1,rel:0.02},
+        {type:'num',k:'i2',label:'Mesh current I<sub>2</sub>',unit:uHTML(u2,'A'),ans:I2/10**u2,rel:0.02},
+        {type:'num',k:'i3',label:'Current through R<sub>2</sub>, flowing <b>downward</b>',unit:uHTML(u3,'A'),ans:IR/10**u3,rel:0.02},
+      ],
+      solution:sol,
+      hints:[
+        `Walk mesh 1 clockwise. Every resistor is a drop of R × (current in your walking direction). In the shared resistor R₂ that current is (I₁ − I₂); in mesh 2 it is (I₂ − I₁).`,
+        `Sources: if your walk enters at the − terminal and leaves at +, it's a <b>rise</b> → +V on the right-hand side. Entering at + and leaving at − is a <b>drop</b> → −V. Check where each source's + mark is relative to the direction you walk through it.`,
+        `Collected form: mesh 1 becomes (R₁ + R₂)·I₁ − R₂·I₂ = ±V₁. Convert every value to the same prefix family first (e.g. V and kΩ give mA), then use Cramer's rule from the formula sheet.`
+      ]
+    };
+  }
+}
+
+/* ============ shared drawing pieces for transistor circuits ============ */
+const termR=(x,y,name,val)=>Ln(x,y,x+34,y)+Dot(x,y)+`<circle class="term" cx="${x+38}" cy="${y}" r="4"/>`+Tx(x+48,y-3,name,'nm')+(val?Tx(x+48,y+13,val,'val'):'');
+const railTop=(x,y,txt)=>Ln(x-22,y,x+22,y)+Tx(x,y-12,txt,'nm','middle');
+const railBot=(x,y,txt)=>Ln(x-22,y,x+22,y)+Tx(x,y+22,txt,'nm','middle');
+
+/* ============ Section 2: BJT DC (lecture 6.2 method) ============ */
+function genBJT(){
+  const want=Math.random()<0.35?'sat':'act';
+  for(let t=0;t<6000;t++){
+    const ckt=want==='sat'?pick(['fixed','fixed','div']):pick(['fixed','div','div','cc']);
+    const VCC=pick([5,6,9,10,12,15]),beta=pick([50,80,100,120,150,200]);
+    let VBB,RB,R1=0,R2=0;
+    if(ckt==='fixed'){VBB=pick([1,1.5,2,2.5,3,5]);RB=rRes(4.7e3,470e3);}
+    else{R2=rRes(47e3,470e3);R1=rRes(22e3,330e3);RB=R1*R2/(R1+R2);VBB=VCC*R1/(R1+R2);}
+    if(VBB<1)continue;
+    const RC=ckt==='cc'?0:rRes(1e3,15e3);
+    const RE=ckt==='fixed'?(Math.random()<0.3?rRes(100,2.2e3):0):rRes(220,10e3);
+    const IB=(VBB-0.7)/(RB+(beta+1)*RE),IC=beta*IB,IE=(beta+1)*IB,VCE=VCC-IC*RC-IE*RE;
+    let mode;
+    if(VCE>0.2){mode='act';if(VCE<0.6||VCE>VCC-0.3)continue;}else{mode='sat';if(VCE<-8||VCE>-0.2)continue;}
+    if(mode!==want||IC<2e-5||IC>0.05)continue;
+    // actual saturation values (VCE = 0.2 V)
+    let IBs=IB,ICs=IC;
+    if(mode==='sat'){const a=RB+RE,b=RE,c=RE,d=RC+RE,e=VBB-0.7,f=VCC-0.2,D=a*d-b*c;IBs=(e*d-b*f)/D;ICs=(a*f-e*c)/D;if(!(IBs>0&&ICs>0&&ICs<beta*IBs))continue;}
+    const R=(v)=>rep2(v,'Ω',RE_,0.2);
+    const g={R1:R(R1),R2:R(R2),RB:R(RB),RC:R(RC),RE:R(RE)};
+    const uB=ansUnit(IB,[-3,-6]),uC=ansUnit(IC,[0,-3,-6]),uE=ansUnit(IE,[0,-3,-6]),uR=ansUnit(RB,[0,3,6]);
+    // ---- diagram
+    const {id,head}=svgHead(420,330,'NPN BJT circuit');const X=100,CX=220,CY=168,XC=CX+24,TOP=48,GND=292;
+    let s=head;
+    if(ckt==='fixed'){
+      s+=srcV(70,CY,GND,true,nm('V','BB'),`${fmt(VBB)} V`,'left')+Gnd(70,GND)+resH(70,CX,CY,nm('R','B',' = '),g.RB.s)+railTop(XC,TOP,`${nm('V','CC',' = ')}<tspan class="val">${VCC} V</tspan>`);
+    }else{
+      s+=Ln(X,TOP,XC,TOP)+Tx((X+XC)/2,TOP-14,`${nm('V','CC',' = ')}<tspan class="val">${VCC} V</tspan>`,'nm','middle')+Dot(X,TOP)+Dot(XC,TOP)+
+        resV(X,TOP,CY,nm('R','2'),g.R2.s,'left')+resV(X,CY,GND,nm('R','1'),g.R1.s,'left')+Gnd(X,GND)+Dot(X,CY)+Ln(X,CY,CX,CY);
+    }
+    s+=npn(CX,CY,id)+Tx(CX-34,CY-7,'B','small','end');
+    s+=RC?resV(XC,TOP,CY-50,nm('R','C'),g.RC.s,'right'):Ln(XC,TOP,XC,CY-50);
+    s+=RE?resV(XC,CY+50,GND,nm('R','E'),g.RE.s,'right'):Ln(XC,CY+50,XC,GND);
+    s+=Gnd(XC,GND)+Tx(XC+52,CY+5,`β = ${beta}`,'nm');
+    if(ckt==='cc')s+=Ln(XC,CY+50,XC+70,CY+50)+Dot(XC,CY+50)+`<circle class="term" cx="${XC+74}" cy="${CY+50}" r="4"/>`+Tx(XC+84,CY+55,'v<tspan dy="4" font-size="10.5">out</tspan>','small');
+    s+='</svg>';
+    const kind=ckt==='fixed'?'Common emitter · base resistor R<sub>B</sub> with V<sub>BB</sub>':ckt==='div'?'Common emitter · voltage-divider bias':'Common collector (emitter follower) · voltage-divider bias';
+    const given=[`V<sub>CC</sub> = ${VCC} V`,...(ckt==='fixed'?[`V<sub>BB</sub> = ${fmt(VBB)} V`,`R<sub>B</sub> = ${g.RB.s}`]:[`R<sub>1</sub> = ${g.R1.s}`,`R<sub>2</sub> = ${g.R2.s}`]),...(RC?[`R<sub>C</sub> = ${g.RC.s}`]:[]),...(RE?[`R<sub>E</sub> = ${g.RE.s}`]:[]),`β = ${beta}`,`V<sub>BE</sub> = 0.7 V`];
+    // ---- fields (mirror the lecture exercise parts)
+    const fields=[];
+    if(ckt!=='fixed')fields.push({type:'h',text:'Step 1 — Voltage division (Thevenin)'},
+      {type:'num',k:'rth',label:'R<sub>th</sub> = R<sub>1</sub> ∥ R<sub>2</sub>',unit:uHTML(uR,'Ω'),ans:RB/10**uR,rel:0.02},
+      {type:'num',k:'vth',label:'V<sub>th</sub>',unit:'V',ans:VBB,rel:0.02,abs:0.02});
+    fields.push({type:'h',text:`${ckt==='fixed'?'Step 1':'Step 2'} — Base loop (Loop 1, KVL)`},
+      {type:'num',k:'ib',label:'Base current I<sub>B</sub>',unit:uHTML(uB,'A'),ans:IB/10**uB,rel:0.02},
+      {type:'h',text:`${ckt==='fixed'?'Step 2':'Step 3'} — Deduce the currents`},
+      {type:'num',k:'ic',label:'Collector current I<sub>C</sub> = βI<sub>B</sub>',unit:uHTML(uC,'A'),ans:IC/10**uC,rel:0.02});
+    if(RE)fields.push({type:'num',k:'ie',label:'Emitter current I<sub>E</sub> = (β+1)I<sub>B</sub>',unit:uHTML(uE,'A'),ans:IE/10**uE,rel:0.02});
+    fields.push({type:'h',text:`${ckt==='fixed'?'Step 3':'Step 4'} — Collector loop (Loop 2, KVL)`},
+      {type:'num',k:'vce',label:'V<sub>CE</sub> from Loop 2',unit:'V',ans:VCE,rel:0.02,abs:0.05},
+      {type:'h',text:`${ckt==='fixed'?'Step 4':'Step 5'} — Compare to find the mode`},
+      {type:'sel',k:'mode',label:'Mode of operation',opts:['Active','Saturation','Cutoff'],ans:mode==='act'?'Active':'Saturation'});
+    // ---- solution
+    const bn=ckt==='fixed'?'V<sub>BB</sub>':'V<sub>th</sub>',rn=ckt==='fixed'?'R<sub>B</sub>':'R<sub>th</sub>';
+    let n=1,sol='';
+    if(ckt!=='fixed')sol+=`<h4>Step ${n++} · Voltage division to find R<sub>th</sub> and V<sub>th</sub></h4>
+<div class="math">R<sub>th</sub> = R₁(R₂)/(R₁+R₂) = ${eng(R1,g.R1.e)}(${eng(R2,g.R2.e)}) / (${eng(R1,g.R1.e)} + ${eng(R2,g.R2.e)}) = <span class="ans">${fmt(RB,5)} Ω</span>
+V<sub>th</sub> = R₁(V<sub>CC</sub>)/(R₁+R₂) = ${eng(R1,g.R1.e)}(${VCC}) / (${eng(R1,g.R1.e)} + ${eng(R2,g.R2.e)}) = <span class="ans">${fmt(VBB)} V</span></div>
+<p>Re-sketch: V<sub>th</sub> in series with R<sub>th</sub> drives the base.</p>`;
+    sol+=`<h4>Step ${n++} · Base Loop 1 (KVL)</h4><div class="math">−${bn} + ${rn}·I<sub>B</sub> + V<sub>BE</sub>${RE?' + R<sub>E</sub>·I<sub>E</sub>':''} = 0
+${RE?`Since I<sub>E</sub> = (β + 1)·I<sub>B</sub>:\n`:''}Sub the values:
+−${fmt(VBB)} + ${eng(RB,ckt==='fixed'?g.RB.e:0)}·I<sub>B</sub> + 0.7${RE?` + ${eng(RE,g.RE.e)}·(${beta}+1)·I<sub>B</sub>`:''} = 0
+I<sub>B</sub> = (${fmt(VBB)} − 0.7) / (${eng(RB,ckt==='fixed'?g.RB.e:0)}${RE?` + ${eng(RE,g.RE.e)}·${beta+1}`:''}) = ${eng(IB)} A = <span class="ans">${withUnit(IB,'A',uB)}</span></div>
+<h4>Step ${n++} · Deduce the currents</h4><div class="math">I<sub>C</sub> = β·I<sub>B</sub> = (${beta})(${eng(IB)}) = <span class="ans">${withUnit(IC,'A',uC)}</span>${RE?`\nI<sub>E</sub> = (β + 1)·I<sub>B</sub> = (${beta+1})(${eng(IB)}) = <span class="ans">${withUnit(IE,'A',uE)}</span>`:''}</div>
+<h4>Step ${n++} · Collector Loop 2 (KVL)</h4><div class="math">−V<sub>CC</sub>${RC?' + I<sub>C</sub>·R<sub>C</sub>':''} + V<sub>CE</sub>${RE?' + I<sub>E</sub>·R<sub>E</sub>':''} = 0
+V<sub>CE</sub> = ${VCC}${RC?` − (${eng(IC)})(${eng(RC,g.RC.e)})`:''}${RE?` − (${eng(IE)})(${eng(RE,g.RE.e)})`:''} = <span class="ans">${fmt(VCE)} V</span></div>
+<h4>Step ${n++} · Mode of operation</h4>`;
+    sol+=mode==='act'?`<p>Since V<sub>BE</sub> = 0.7 V &gt; 0.5 V and V<sub>CE</sub> = ${fmt(VCE)} V &gt; 0.2 V → <span class="ans">Active mode</span>.</p>`
+      :`<p>V<sub>BE</sub> = 0.7 V &gt; 0.5 V, but V<sub>CE</sub> = ${fmt(VCE)} V &lt; 0.2 V. A real transistor can't do that: the collector–base junction is forward biased → <span class="ans">Saturation mode</span>.</p>
+<p>In saturation, I<sub>C</sub> = βI<sub>B</sub> no longer holds. The real values are V<sub>CE</sub> = V<sub>CE(sat)</sub> = 0.2 V and ${RE?`(solving both loops with V<sub>CE</sub> = 0.2 V) I<sub>B</sub> ≈ ${nat(IBs,'A',IE_)}, I<sub>C</sub> ≈ ${nat(ICs,'A',IE_)}`:`I<sub>C(sat)</sub> = (V<sub>CC</sub> − 0.2)/R<sub>C</sub> = ${nat(ICs,'A',IE_)}`}, which is less than βI<sub>B</sub> = ${nat(IC,'A',IE_)}.</p>`;
+    return {kind,svg:s,
+      prompt:`<p>NPN transistor, DC analysis. Follow the lecture steps: ${ckt==='fixed'?'':'voltage division, '}Loop 1 for I<sub>B</sub>, deduce I<sub>C</sub>${RE?' and I<sub>E</sub>':''}, Loop 2 for V<sub>CE</sub>, then compare to find the mode. Use I<sub>C</sub> = βI<sub>B</sub> in Loop 2 even if the result looks odd. That's how you detect saturation.</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+      fields,solution:sol,
+      hints:[
+        ckt==='fixed'?`Convert R<sub>B</sub>${RC?', R<sub>C</sub>':''}${RE?', R<sub>E</sub>':''} to ohms first. The base loop is: V<sub>BB</sub> → R<sub>B</sub> → base → emitter${RE?' → R<sub>E</sub>':''} → ground.`:`R₁ is the <b>bottom</b> divider resistor, so V<sub>th</sub> = V<sub>CC</sub>·R₁/(R₁+R₂), R<sub>th</sub> = R₁R₂/(R₁+R₂).`,
+        `Loop 1: −${bn} + ${rn}·I<sub>B</sub> + V<sub>BE</sub>${RE?' + R<sub>E</sub>·I<sub>E</sub>':''} = 0${RE?', and substitute I<sub>E</sub> = (β+1)I<sub>B</sub>':''}. Solve for I<sub>B</sub>.`,
+        `Loop 2: −V<sub>CC</sub>${RC?' + I<sub>C</sub>R<sub>C</sub>':''} + V<sub>CE</sub>${RE?' + I<sub>E</sub>R<sub>E</sub>':''} = 0. Active needs V<sub>BE</sub> &gt; 0.5 V <b>and</b> V<sub>CE</sub> &gt; 0.2 V; if V<sub>CE</sub> comes out below 0.2 V, it's saturated.`]};
+  }
+}
+
+/* ============ Section 3: MOSFET DC (lectures 9.1–10.2 method) ============ */
+const r2=v=>Math.round(v*100)/100;
+function mosDev(){
+  const knv=pick([0.1,0.2,0.4,0.43,0.5,0.8,1])*1e-3;const kd=rep2(knv,'A/V²',[-3,-6],0.3);
+  let r,wl,wlSol;
+  if(Math.random()<0.5){r=pick([2,4,5,8,10,16,20]);wl=[`W/L = ${r}`];wlSol=`(${r})`;}
+  else{const L=pick([0.18,0.25,0.4,0.5,1]);r=pick([2,4,5,8,10,16,32]);const W=+(L*r).toPrecision(4);wl=[`W = ${fmt(W)} µm`,`L = ${fmt(L)} µm`];wlSol=`(${fmt(W)}×10<sup>−6</sup> / ${fmt(L)}×10<sup>−6</sup>)`;}
+  const Vth=pick([0.3,0.4,0.5,0.7,1,1.5,2]);
+  return {kn:knv,K:knv*r,Vth,given:[`V<sub>th</sub> = ${Vth} V`,`k′<sub>n</sub> = ${kd.s}`,...wl],knE:`${eng(knv,kd.e)}`,wlSol};
+}
+const satEq=(d,Vov)=>`i<sub>D</sub> = ½ k′<sub>n</sub> (W/L) V<sub>ov</sub>² = ½ (${d.knE}) ${d.wlSol} (${fmt(Vov)})²`;
+const triEq=(d,Vov,VDS)=>`i<sub>D</sub> = k′<sub>n</sub> (W/L) [V<sub>ov</sub>·V<sub>DS</sub> − ½V<sub>DS</sub>²] = (${d.knE}) ${d.wlSol} [${fmt(Vov)}·${fmt(VDS)} − ½(${fmt(VDS)})²]`;
+const REG=['Cutoff','Triode','Saturation','Edge of saturation'];
+const regionWhy=(VGS,Vth,VDS,Vov,reg)=>reg==='Cutoff'?`V<sub>GS</sub> = ${fmt(VGS)} V &lt; V<sub>th</sub> = ${Vth} V → <span class="ans">Cutoff</span> (I<sub>D</sub> = 0 A)`
+  :`V<sub>GS</sub> = ${fmt(VGS)} V &gt; V<sub>th</sub> = ${Vth} V (not cutoff), and V<sub>DS</sub> = ${fmt(VDS)} V ${reg==='Triode'?'&lt;':reg==='Saturation'?'&gt;':'='} V<sub>ov</sub> = ${fmt(Vov)} V → <span class="ans">${reg} region</span>`;
+const MOS_HINTS={
+  vov:`V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub>. Compare first: V<sub>GS</sub> &lt; V<sub>th</sub> means cutoff and I<sub>D</sub> = 0.`,
+  reg:`Compare V<sub>DS</sub> with V<sub>ov</sub>: V<sub>DS</sub> &lt; V<sub>ov</sub> → triode, V<sub>DS</sub> &gt; V<sub>ov</sub> → saturation, V<sub>DS</sub> = V<sub>ov</sub> → edge of saturation.`,
+  conv:`Put k′<sub>n</sub> in A/V² (e.g. 0.4 mA/V² = 0.4×10<sup>−3</sup> A/V²) and W, L in metres (or just use the ratio W/L) before substituting.`};
+function mosBare(id,G,D,S){
+  const {head}=svgHead(330,250,'NMOS transistor');const CX=140,CY=125,XC=CX+24;
+  return head+nmos(CX,CY,id)+Ln(CX-8,CY,70,CY)+`<circle class="term" cx="66" cy="${CY}" r="4"/>`+Tx(56,CY-3,'G','nm','end')+(G?Tx(56,CY+13,G,'val','end'):'')+
+    Ln(XC,CY-50,XC,CY-90)+`<circle class="term" cx="${XC}" cy="${CY-94}" r="4"/>`+Tx(XC+14,CY-90,'D','nm')+(D?Tx(XC+30,CY-90,D,'val'):'')+
+    Ln(XC,CY+50,XC,CY+90)+`<circle class="term" cx="${XC}" cy="${CY+94}" r="4"/>`+Tx(XC+14,CY+98,'S','nm')+(S?Tx(XC+30,CY+98,S,'val'):'')+'</svg>';
+}
+function genMOS(){
+  const type=pick(['volt','volt','edge','dual','dual','div','div','div','diode']);
+  for(let t=0;t<6000;t++){
+    const d=mosDev();const {Vth,K}=d;
+    const {id}=svgHead(1,1,'');UID--; // reserve id generation consistency
+    if(type==='volt'){
+      const want=pick(['Cutoff','Triode','Triode','Saturation','Saturation','Edge of saturation']);
+      let VGS,VDS,Vov;
+      if(want==='Cutoff'){VGS=r2(Math.max(0,Vth-pick([0.1,0.2,0.3,0.5,1])));VDS=pick([0.5,1,1.5,2]);}
+      else{Vov=pick([0.2,0.3,0.5,0.8,1,1.5,2]);VGS=r2(Vth+Vov);VDS=want==='Edge of saturation'?Vov:want==='Saturation'?r2(Vov+pick([0.2,0.5,1])):r2(Vov-pick([0.1,0.2,0.3,0.5,1]));if(VDS<0.05)continue;}
+      Vov=r2(VGS-Vth);
+      const ID=want==='Cutoff'?0:want==='Triode'?K*(Vov*VDS-0.5*VDS*VDS):0.5*K*Vov*Vov;
+      if(want!=='Cutoff'&&(ID<1e-6||ID>0.05))continue;
+      const nodes=Math.random()<0.5;const VS=nodes?pick([0,0,0.5,1]):0,VG=r2(VS+VGS),VD=r2(VS+VDS);
+      const uD=want==='Cutoff'?-3:ansUnit(ID,[0,-3,-6]);
+      const fields=[];
+      if(nodes)fields.push({type:'num',k:'vgs',label:'V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub>',unit:'V',ans:VGS,rel:0.01,abs:0.01},{type:'num',k:'vds',label:'V<sub>DS</sub> = V<sub>D</sub> − V<sub>S</sub>',unit:'V',ans:VDS,rel:0.01,abs:0.01});
+      fields.push({type:'num',k:'vov',label:'Overdrive voltage V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.01,abs:0.01},
+        {type:'sel',k:'reg',label:'Region of operation',opts:REG,ans:want},
+        {type:'num',k:'id',label:'Drain current I<sub>D</sub>',unit:uHTML(uD,'A'),ans:ID/10**uD,rel:0.02,abs:want==='Cutoff'?0.0005:0});
+      const svg=mosBare(id,nodes?`${fmt(VG)} V`:'',nodes?`${fmt(VD)} V`:'',nodes?`${fmt(VS)} V`:'');
+      const given=[...d.given,...(nodes?[`V<sub>G</sub> = ${fmt(VG)} V`,`V<sub>D</sub> = ${fmt(VD)} V`,`V<sub>S</sub> = ${fmt(VS)} V`]:[`V<sub>GS</sub> = ${fmt(VGS)} V`,`V<sub>DS</sub> = ${fmt(VDS)} V`])];
+      let sol=nodes?`<h4>Step 1 · Terminal voltages</h4><div class="math">V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub> = ${fmt(VG)} − ${fmt(VS)} = <span class="ans">${fmt(VGS)} V</span>\nV<sub>DS</sub> = V<sub>D</sub> − V<sub>S</sub> = ${fmt(VD)} − ${fmt(VS)} = <span class="ans">${fmt(VDS)} V</span></div>`:'';
+      sol+=`<h4>Step ${nodes?2:1} · Overdrive voltage</h4><div class="math">V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub> = ${fmt(VGS)} − ${Vth} = <span class="ans">${fmt(Vov)} V</span></div>
+<h4>Step ${nodes?3:2} · Compare to find the region</h4><p>${regionWhy(VGS,Vth,VDS,Vov,want)}.</p>
+<h4>Step ${nodes?4:3} · Drain current</h4><div class="math">${want==='Cutoff'?'Cutoff → i<sub>D</sub> = <span class="ans">0 A</span>':(want==='Triode'?triEq(d,Vov,VDS):satEq(d,Vov))+(want==='Cutoff'?'':`\ni<sub>D</sub> = ${eng(ID)} A = <span class="ans">${withUnit(ID,'A',uD)}</span>`)}</div>`;
+      return {kind:'NMOS · given terminal voltages',svg,prompt:`<p>Consider the NMOS transistor with the values below. ${nodes?'Find V<sub>GS</sub> and V<sub>DS</sub>, then':'Find'} the overdrive voltage, decide which region it operates in (justify by comparing), and find the drain current.</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+        fields,solution:sol,hints:[MOS_HINTS.vov,MOS_HINTS.reg,MOS_HINTS.conv+` Then use the current equation for the region you found.`]};
+    }
+    if(type==='edge'){
+      const Vov=pick([0.1,0.2,0.25,0.3,0.4,0.5]);const VGS=r2(Vth+Vov),ID=0.5*K*Vov*Vov;if(ID<1e-6||ID>0.05)continue;
+      const byI=Math.random()<0.5;const iD=rep2(ID,'A',[-3,-6],0);const uD=ansUnit(ID,[0,-3,-6]);
+      const fields=byI?[{type:'num',k:'vov',label:'V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.02,abs:0.005},{type:'num',k:'vgs',label:'V<sub>GS</sub>',unit:'V',ans:VGS,rel:0.01,abs:0.01},{type:'num',k:'vds',label:'V<sub>DS</sub> at the edge of saturation',unit:'V',ans:Vov,rel:0.02,abs:0.005}]
+        :[{type:'num',k:'vov',label:'V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.01,abs:0.005},{type:'num',k:'vds',label:'V<sub>DS</sub> at the edge of saturation',unit:'V',ans:Vov,rel:0.01,abs:0.005},{type:'num',k:'id',label:'Drain current I<sub>D</sub>',unit:uHTML(uD,'A'),ans:ID/10**uD,rel:0.02}];
+      const given=[...d.given,byI?`I<sub>D</sub> = ${iD.s}`:`V<sub>GS</sub> = ${fmt(VGS)} V`];
+      const sol=byI?`<h4>Step 1 · Saturation equation (edge of saturation still uses it)</h4><div class="math">${satEq(d,0).replace(/\(0\)²$/,'V<sub>ov</sub>²')} = ${eng(ID,iD.e)}
+${fmt(0.5*K,4)} · V<sub>ov</sub>² = ${eng(ID,iD.e)}
+V<sub>ov</sub>² = ${fmt(ID/(0.5*K),4)}   →   V<sub>ov</sub> = √${fmt(ID/(0.5*K),4)} = <span class="ans">${fmt(Vov)} V</span></div>
+<h4>Step 2 · V<sub>GS</sub></h4><div class="math">V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub> ⇒ V<sub>GS</sub> = V<sub>ov</sub> + V<sub>th</sub> = ${fmt(Vov)} + ${Vth} = <span class="ans">${fmt(VGS)} V</span></div>
+<h4>Step 3 · V<sub>DS</sub></h4><p>Edge of saturation means V<sub>DS</sub> = V<sub>ov</sub> = <span class="ans">${fmt(Vov)} V</span>.</p>`
+        :`<h4>Step 1 · Overdrive voltage</h4><div class="math">V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub> = ${fmt(VGS)} − ${Vth} = <span class="ans">${fmt(Vov)} V</span></div>
+<h4>Step 2 · V<sub>DS</sub></h4><p>Edge of saturation means V<sub>DS</sub> = V<sub>ov</sub> = <span class="ans">${fmt(Vov)} V</span>.</p>
+<h4>Step 3 · Drain current</h4><div class="math">${satEq(d,Vov)}\ni<sub>D</sub> = ${eng(ID)} A = <span class="ans">${withUnit(ID,'A',uD)}</span></div>`;
+      return {kind:'NMOS · edge of saturation',svg:mosBare(id,'','',''),prompt:`<p>The NMOS transistor below operates at the <b>edge of saturation</b>. ${byI?'Find V<sub>ov</sub>, the V<sub>GS</sub> that produces this current, and V<sub>DS</sub>.':'Find V<sub>ov</sub>, the required V<sub>DS</sub>, and I<sub>D</sub>.'}</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+        fields,solution:sol,hints:[`At the edge of saturation V<sub>DS</sub> = V<sub>ov</sub>, and the saturation equation i<sub>D</sub> = ½k′<sub>n</sub>(W/L)V<sub>ov</sub>² still applies.`,MOS_HINTS.conv,byI?`Rearrange: V<sub>ov</sub> = √(2I<sub>D</sub> / (k′<sub>n</sub>·W/L)), then V<sub>GS</sub> = V<sub>ov</sub> + V<sub>th</sub>.`:`V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub>; substitute into the saturation equation for I<sub>D</sub>.`]};
+    }
+    if(type==='dual'){
+      const VDD=pick([1,1.5,1.8,2.5,3,5]),VSS=-pick([1,1.5,2.5,3,5]),Vov=pick([0.1,0.2,0.25,0.3,0.4,0.5]);
+      const VGS=r2(Vth+Vov),VS=-VGS;if(VS<VSS+0.2)continue;const ID=0.5*K*Vov*Vov;if(ID<1e-6||ID>0.02)continue;
+      const lo=Math.ceil((VS+Vov+0.1)*10)/10,hi=Math.floor((VDD-0.1)*10)/10;if(hi<lo)continue;
+      const VD=r2(lo+Math.floor(Math.random()*(Math.round((hi-lo)*10)+1))/10);
+      const RD=(VDD-VD)/ID,RS=(VS-VSS)/ID;if(RD<50||RS<50||RD>5e6||RS>5e6)continue;
+      const iD=rep2(ID,'A',[-3,-6],0),uRD=ansUnit(RD,[0,3,6]),uRS=ansUnit(RS,[0,3,6]);
+      const {head}=svgHead(420,350,'NMOS dual-supply circuit');const CX=210,CY=170,XC=CX+24,TOP=48,BOT=300;
+      const svg=head+railTop(XC,TOP,`${nm('V','DD',' = ')}<tspan class="val">+${VDD} V</tspan>`)+resV(XC,TOP,CY-50,nm('R','D'),'?','right')+termR(XC,CY-50,nm('V','D'),`${fmt(VD)} V`)+
+        nmos(CX,CY,id)+Ln(CX-8,CY,120,CY)+Ln(120,CY,120,CY+24)+Gnd(120,CY+24)+Tx(CX-34,CY-7,'G','small','end')+
+        resV(XC,CY+50,BOT,nm('R','S'),'?','right')+railBot(XC,BOT,`${nm('V','SS',' = ')}<tspan class="val">−${Math.abs(VSS)} V</tspan>`)+'</svg>';
+      const given=[`V<sub>DD</sub> = +${VDD} V`,`V<sub>SS</sub> = −${Math.abs(VSS)} V`,`I<sub>D</sub> = ${iD.s}`,`V<sub>D</sub> = ${fmt(VD)} V`,...d.given];
+      const sol=`<h4>Step 1 · Saturation equation → V<sub>ov</sub></h4><div class="math">${satEq(d,0).replace(/\(0\)²$/,'V<sub>ov</sub>²')} = ${eng(ID,iD.e)}
+V<sub>ov</sub>² = ${fmt(ID/(0.5*K),4)}   →   V<sub>ov</sub> = <span class="ans">${fmt(Vov)} V</span></div>
+<h4>Step 2 · V<sub>GS</sub></h4><div class="math">V<sub>GS</sub> = V<sub>ov</sub> + V<sub>th</sub> = ${fmt(Vov)} + ${Vth} = <span class="ans">${fmt(VGS)} V</span></div>
+<h4>Step 3 · Source voltage</h4><div class="math">V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub> ⇒ V<sub>S</sub> = V<sub>G</sub> − V<sub>GS</sub> = 0 − ${fmt(VGS)} = <span class="ans">${fmt(VS)} V</span></div>
+<h4>Step 4 · R<sub>D</sub></h4><div class="math">R<sub>D</sub> = (V<sub>DD</sub> − V<sub>D</sub>) / I<sub>D</sub> = (${VDD} − ${fmt(VD)}) / ${eng(ID,iD.e)} = ${fmt(RD,5)} Ω = <span class="ans">${withUnit(RD,'Ω',uRD)}</span></div>
+<h4>Step 5 · R<sub>S</sub></h4><div class="math">R<sub>S</sub> = (V<sub>S</sub> − V<sub>SS</sub>) / I<sub>D</sub> = (${fmt(VS)} − (${fmt(VSS)})) / ${eng(ID,iD.e)} = ${fmt(RS,5)} Ω = <span class="ans">${withUnit(RS,'Ω',uRS)}</span></div>
+<p>Check: V<sub>DS</sub> = ${fmt(VD)} − (${fmt(VS)}) = ${fmt(VD-VS)} V &gt; V<sub>ov</sub> = ${fmt(Vov)} V, so it is in saturation as stated ✓</p>`;
+      return {kind:'Common source · dual supply, gate grounded',svg,prompt:`<p>The transistor operates in the <b>saturation region</b> at the I<sub>D</sub> and V<sub>D</sub> given. Find V<sub>ov</sub>, V<sub>GS</sub>, the source voltage V<sub>S</sub>, R<sub>D</sub> and R<sub>S</sub>.</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+        fields:[{type:'num',k:'vov',label:'Overdrive voltage V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.02,abs:0.005},{type:'num',k:'vgs',label:'V<sub>GS</sub>',unit:'V',ans:VGS,rel:0.01,abs:0.01},
+          {type:'num',k:'vs',label:'Source voltage V<sub>S</sub>',unit:'V',ans:VS,rel:0.01,abs:0.01},{type:'num',k:'rd',label:'R<sub>D</sub>',unit:uHTML(uRD,'Ω'),ans:RD/10**uRD,rel:0.02},{type:'num',k:'rs',label:'R<sub>S</sub>',unit:uHTML(uRS,'Ω'),ans:RS/10**uRS,rel:0.02}],
+        solution:sol,hints:[`It's in saturation, so start from i<sub>D</sub> = ½k′<sub>n</sub>(W/L)V<sub>ov</sub>² and solve for V<sub>ov</sub>. ${MOS_HINTS.conv}`,`The gate is grounded (V<sub>G</sub> = 0), so V<sub>S</sub> = V<sub>G</sub> − V<sub>GS</sub> = −V<sub>GS</sub>.`,`Ohm's law across each resistor: R<sub>D</sub> = (V<sub>DD</sub> − V<sub>D</sub>)/I<sub>D</sub> and R<sub>S</sub> = (V<sub>S</sub> − V<sub>SS</sub>)/I<sub>D</sub>.`]};
+    }
+    if(type==='div'){
+      const cd=Math.random()<0.35;const want=cd?'Saturation':(Math.random()<0.65?'Saturation':'Triode');
+      const VDD=pick([5,9,10,12,15]),RG1=rRes(100e3,10e6),RG2=rRes(100e3,10e6),VG=VDD*RG2/(RG1+RG2);
+      const ID=pick([0.1,0.2,0.25,0.4,0.5,0.8,1,1.5,2])*1e-3,RD=cd?0:rRes(1e3,22e3),RS=rRes(470,10e3);
+      const VS=ID*RS,VD=VDD-ID*RD,VGS=VG-VS,Vov=VGS-Vth,VDS=VD-VS;
+      if(VGS<Vth+0.15||VDS<0.1)continue;
+      const reg=VDS>Vov+0.15?'Saturation':VDS<Vov-0.15?'Triode':null;if(reg!==want)continue;
+      const g={G1:rep2(RG1,'Ω',RE_,0.2),G2:rep2(RG2,'Ω',RE_,0.2),RD:rep2(RD,'Ω',RE_,0.2),RS:rep2(RS,'Ω',RE_,0.2)};const iD=rep2(ID,'A',[-3,-6],0.2);
+      const {head}=svgHead(420,330,'NMOS divider-bias circuit');const X=100,CX=220,CY=168,XC=CX+24,TOP=48,GND=292;
+      let svg=head+Ln(X,TOP,XC,TOP)+Tx((X+XC)/2,TOP-14,`${nm('V','DD',' = ')}<tspan class="val">${VDD} V</tspan>`,'nm','middle')+Dot(X,TOP)+Dot(XC,TOP)+
+        resV(X,TOP,CY,nm('R','G1'),g.G1.s,'left')+resV(X,CY,GND,nm('R','G2'),g.G2.s,'left')+Gnd(X,GND)+Dot(X,CY)+Ln(X,CY,CX-8,CY)+nmos(CX,CY,id)+Tx(CX-34,CY-7,'G','small','end')+
+        (RD?resV(XC,TOP,CY-50,nm('R','D'),g.RD.s,'right'):Ln(XC,TOP,XC,CY-50))+resV(XC,CY+50,GND,nm('R','S'),g.RS.s,'right')+Gnd(XC,GND)+
+        Tx(XC+50,CY+5,`${nm('V','th',' = ')}${Vth} V`,'nm');
+      if(cd)svg+=Ln(XC,CY+50,XC+70,CY+50)+Dot(XC,CY+50)+`<circle class="term" cx="${XC+74}" cy="${CY+50}" r="4"/>`+Tx(XC+84,CY+55,'v<tspan dy="4" font-size="10.5">out</tspan>','small');
+      svg+='</svg>';
+      const given=[`V<sub>DD</sub> = ${VDD} V`,`R<sub>G1</sub> = ${g.G1.s}`,`R<sub>G2</sub> = ${g.G2.s}`,...(RD?[`R<sub>D</sub> = ${g.RD.s}`]:[]),`R<sub>S</sub> = ${g.RS.s}`,`V<sub>th</sub> = ${Vth} V`,`I<sub>D</sub> = ${iD.s}`];
+      const sol=`<h4>Step 1 · Voltage division → V<sub>G</sub></h4><p>i<sub>G</sub> = 0, so the divider is unloaded:</p><div class="math">V<sub>G</sub> = R<sub>G2</sub>/(R<sub>G1</sub>+R<sub>G2</sub>)·V<sub>DD</sub> = ${eng(RG2,g.G2.e)}/(${eng(RG1,g.G1.e)} + ${eng(RG2,g.G2.e)}) × ${VDD} = <span class="ans">${fmt(VG)} V</span></div>
+<h4>Step 2 · Drain voltage</h4><div class="math">${RD?`I<sub>D</sub> = (V<sub>DD</sub> − V<sub>D</sub>)/R<sub>D</sub> ⇒ V<sub>D</sub> = V<sub>DD</sub> − I<sub>D</sub>R<sub>D</sub> = ${VDD} − (${eng(ID,iD.e)})(${eng(RD,g.RD.e)}) = <span class="ans">${fmt(VD)} V</span>`:`The drain connects straight to V<sub>DD</sub>: V<sub>D</sub> = <span class="ans">${VDD} V</span>`}</div>
+<h4>Step 3 · Source voltage</h4><div class="math">I<sub>D</sub> = (V<sub>S</sub> − 0)/R<sub>S</sub> ⇒ V<sub>S</sub> = I<sub>D</sub>R<sub>S</sub> = (${eng(ID,iD.e)})(${eng(RS,g.RS.e)}) = <span class="ans">${fmt(VS)} V</span></div>
+<h4>Step 4 · Deduce V<sub>DS</sub>, V<sub>GS</sub>, V<sub>ov</sub></h4><div class="math">V<sub>DS</sub> = V<sub>D</sub> − V<sub>S</sub> = ${fmt(VD)} − ${fmt(VS)} = <span class="ans">${fmt(VDS)} V</span>
+V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub> = ${fmt(VG)} − ${fmt(VS)} = <span class="ans">${fmt(VGS)} V</span>
+V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub> = ${fmt(VGS)} − ${Vth} = <span class="ans">${fmt(Vov)} V</span></div>
+<h4>Step 5 · Region of operation</h4><p>${regionWhy(VGS,Vth,VDS,Vov,reg)}.</p>`;
+      return {kind:cd?'Common drain (source follower) · voltage-divider bias':'Common source · voltage-divider bias',svg,
+        prompt:`<p>For the circuit shown, the NMOS transistor conducts the I<sub>D</sub> given. Find the voltages at all nodes, deduce V<sub>DS</sub>, V<sub>GS</sub> and V<sub>ov</sub>, then decide the region of operation.</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+        fields:[{type:'num',k:'vg',label:'Gate voltage V<sub>G</sub> (voltage division)',unit:'V',ans:VG,rel:0.015,abs:0.02},{type:'num',k:'vd',label:'Drain voltage V<sub>D</sub>',unit:'V',ans:VD,rel:0.015,abs:0.02},{type:'num',k:'vs',label:'Source voltage V<sub>S</sub>',unit:'V',ans:VS,rel:0.015,abs:0.02},
+          {type:'num',k:'vds',label:'V<sub>DS</sub>',unit:'V',ans:VDS,rel:0.02,abs:0.03},{type:'num',k:'vgs',label:'V<sub>GS</sub>',unit:'V',ans:VGS,rel:0.02,abs:0.03},{type:'num',k:'vov',label:'V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.02,abs:0.03},
+          {type:'sel',k:'reg',label:'Region of operation',opts:REG,ans:reg}],
+        solution:sol,hints:[`No current enters the gate (i<sub>G</sub> = 0), so V<sub>G</sub> = V<sub>DD</sub>·R<sub>G2</sub>/(R<sub>G1</sub>+R<sub>G2</sub>).`,`Convert I<sub>D</sub> to amps and the resistors to ohms. Then ${RD?'V<sub>D</sub> = V<sub>DD</sub> − I<sub>D</sub>R<sub>D</sub> and ':''}V<sub>S</sub> = I<sub>D</sub>R<sub>S</sub>${RD?'':' (the drain sits at V<sub>DD</sub>)'}.`,MOS_HINTS.reg]};
+    }
+    // diode-connected
+    const VDD=pick([1.3,1.5,1.8,2.5,3.3,5]),Vov=pick([0.1,0.2,0.3,0.4,0.5]);const VD=r2(Vth+Vov);if(VD>VDD-0.15)continue;
+    const ID=0.5*K*Vov*Vov;if(ID<1e-6||ID>0.02)continue;const R=(VDD-VD)/ID;if(R<50||R>5e6)continue;
+    const uD=ansUnit(ID,[0,-3,-6]),uR=ansUnit(R,[0,3,6]);
+    const {head}=svgHead(420,330,'Diode-connected NMOS');const CX=210,CY=175,XC=CX+24,TOP=48,GND=292;
+    const svg=head+railTop(XC,TOP,`<tspan class="val">+${VDD} V</tspan>`)+resV(XC,TOP,CY-50,'R','?','right')+termR(XC,CY-50,nm('V','D'),`${fmt(VD)} V`)+
+      Ln(XC,CY-50,CX-40,CY-50)+Ln(CX-40,CY-50,CX-40,CY)+Ln(CX-40,CY,CX-8,CY)+nmos(CX,CY,id)+Ln(XC,CY+50,XC,GND)+Gnd(XC,GND)+'</svg>';
+    const given=[`V<sub>DD</sub> = ${VDD} V`,`V<sub>D</sub> = ${fmt(VD)} V`,...d.given];
+    const sol=`<h4>Step 1 · Terminal voltages from the sketch</h4><p>The gate is tied to the drain, so V<sub>G</sub> = V<sub>D</sub> = ${fmt(VD)} V, and the source is grounded (V<sub>S</sub> = 0).</p><div class="math">V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub> = ${fmt(VD)} − 0 = <span class="ans">${fmt(VD)} V</span>
+V<sub>DS</sub> = V<sub>D</sub> − V<sub>S</sub> = ${fmt(VD)} − 0 = <span class="ans">${fmt(VD)} V</span></div>
+<h4>Step 2 · Overdrive and region</h4><div class="math">V<sub>ov</sub> = ${fmt(VD)} − ${Vth} = <span class="ans">${fmt(Vov)} V</span></div><p>${regionWhy(VD,Vth,VD,Vov,'Saturation')}. (A diode-connected NMOS is always in saturation when on.)</p>
+<h4>Step 3 · Drain current</h4><div class="math">${satEq(d,Vov)}\ni<sub>D</sub> = ${eng(ID)} A = <span class="ans">${withUnit(ID,'A',uD)}</span></div>
+<h4>Step 4 · R</h4><div class="math">R = (${VDD} − V<sub>D</sub>) / I<sub>D</sub> = (${VDD} − ${fmt(VD)}) / ${eng(ID)} = <span class="ans">${withUnit(R,'Ω',uR)}</span></div>`;
+    return {kind:'Diode-connected NMOS (gate tied to drain)',svg,prompt:`<p>For the circuit shown, get V<sub>GS</sub> and V<sub>DS</sub> from the sketch, find V<sub>ov</sub> and the region, then the drain current and R.</p><div class="given">${given.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+      fields:[{type:'num',k:'vgs',label:'V<sub>GS</sub>',unit:'V',ans:VD,rel:0.01,abs:0.01},{type:'num',k:'vds',label:'V<sub>DS</sub>',unit:'V',ans:VD,rel:0.01,abs:0.01},{type:'num',k:'vov',label:'V<sub>ov</sub>',unit:'V',ans:Vov,rel:0.02,abs:0.005},
+        {type:'sel',k:'reg',label:'Region of operation',opts:REG,ans:'Saturation'},{type:'num',k:'id',label:'Drain current I<sub>D</sub>',unit:uHTML(uD,'A'),ans:ID/10**uD,rel:0.02},{type:'num',k:'r',label:'R',unit:uHTML(uR,'Ω'),ans:R/10**uR,rel:0.02}],
+      solution:sol,hints:[`Read the sketch: the gate wire joins the drain, so V<sub>G</sub> = V<sub>D</sub>; the source is at ground.`,MOS_HINTS.reg,`Use the saturation equation for I<sub>D</sub> (${MOS_HINTS.conv.toLowerCase()}), then Ohm's law across R.`]};
+  }
+}
+
+/* ============ formula sheets ============ */
+const PREFIX_TBL=`<table class="pt"><tr><th>Prefix</th><th>Symbol</th><th>Factor</th></tr>
+<tr><td>giga</td><td>G</td><td>10<sup>9</sup></td></tr><tr><td>mega</td><td>M</td><td>10<sup>6</sup></td></tr><tr><td>kilo</td><td>k</td><td>10<sup>3</sup></td></tr>
+<tr><td>milli</td><td>m</td><td>10<sup>−3</sup></td></tr><tr><td>micro</td><td>µ</td><td>10<sup>−6</sup></td></tr><tr><td>nano</td><td>n</td><td>10<sup>−9</sup></td></tr><tr><td>pico</td><td>p</td><td>10<sup>−12</sup></td></tr></table>`;
+const SHORTCUTS=`<table class="pt"><tr><td>V ÷ kΩ</td><td>= mA</td></tr><tr><td>V ÷ MΩ</td><td>= µA</td></tr><tr><td>kV ÷ kΩ</td><td>= A</td></tr><tr><td>kV ÷ MΩ</td><td>= mA</td></tr><tr><td>mA × kΩ</td><td>= V</td></tr><tr><td>µA × MΩ</td><td>= V</td></tr></table>`;
+const SHEETS={
+units:`<h3>Metric prefixes</h3>${PREFIX_TBL}
+<h3>Converting</h3><p>new value = old value × 10<sup>(old exponent − new exponent)</sup></p>
+<div class="math">4.7 kΩ → Ω:  4.7 × 10^(3−0) = 4700 Ω
+350 µA → mA: 350 × 10^(−6−(−3)) = 0.35 mA</div>
+<h3>Ohm's law shortcuts</h3><p>V = I·R</p>${SHORTCUTS}`,
+mesh:`<h3>Kirchhoff &amp; Ohm</h3>
+<p><b>KVL:</b> around any closed loop, Σ rises = Σ drops.</p>
+<p><b>KCL:</b> at any node, Σ currents in = Σ currents out.</p>
+<p><b>Ohm:</b> V = I·R, a drop in the direction of current.</p>
+<h3>Mesh method</h3><ol>
+<li>Give each window a clockwise mesh current.</li>
+<li>Walk each mesh in its current's direction. Each resistor: drop = R × (current in walking direction).</li>
+<li>Shared resistor: own mesh current minus the neighbour's (I₁ − I₂ in mesh 1).</li>
+<li>Source met − → + : rise → <b>+V</b> on the RHS. Met + → − : drop → <b>−V</b>.</li></ol>
+<h3>Collected form</h3>
+<div class="math">(R₁+R₂)·I₁ −      R₂·I₂ = ±V₁
+   −R₂·I₁ + (R₂+R₃)·I₂ = ±V₂</div>
+<h3>Cramer's rule (2×2)</h3>
+<div class="math">a·I₁ + b·I₂ = e
+c·I₁ + d·I₂ = f
+Δ  = ad − bc
+I₁ = (ed − bf) / Δ
+I₂ = (af − ec) / Δ</div>
+<h3>Prefixes</h3>${PREFIX_TBL}${SHORTCUTS}`,
+bjt:`<h3>NPN relations</h3>
+<div class="math">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>
+α = β/(β+1),   I<sub>C</sub> = α·I<sub>E</sub>
+V<sub>BE(on)</sub> = 0.7 V,  V<sub>CE(sat)</sub> = 0.2 V</div>
+<h3>Modes of operation (NPN)</h3>
+<table class="pt"><tr><th>Mode</th><th>Conditions</th><th>Use</th></tr>
+<tr><td>Cutoff</td><td>V<sub>BE</sub> &lt; 0.7 V</td><td>I<sub>B</sub> = I<sub>C</sub> = 0</td></tr>
+<tr><td>Active</td><td>BE forward (V<sub>BE</sub> = 0.7 V), BC reverse: V<sub>CE</sub> &gt; 0.2 V</td><td>I<sub>C</sub> = βI<sub>B</sub><br>I<sub>E</sub> = (β+1)I<sub>B</sub></td></tr>
+<tr><td>Saturation</td><td>both junctions forward: V<sub>BE</sub> = 0.7 V, V<sub>CE</sub> = 0.2 V</td><td>I<sub>C</sub> &lt; βI<sub>B</sub><br>(β<sub>forced</sub> = I<sub>C</sub>/I<sub>B</sub> &lt; β)</td></tr></table>
+<h3>Base divider → Thevenin</h3>
+<div class="math">V<sub>BB</sub> = V<sub>CC</sub>·R₂/(R₁+R₂)
+R<sub>BB</sub> = R₁‖R₂ = R₁R₂/(R₁+R₂)</div>
+<h3>Loop equations (KVL)</h3>
+<div class="math">Base:      V<sub>BB</sub> = I<sub>B</sub>R<sub>BB</sub> + V<sub>BE</sub> + I<sub>E</sub>R<sub>E</sub>
+Collector: V<sub>CC</sub> = I<sub>C</sub>R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub>R<sub>E</sub>
+Active:    I<sub>B</sub> = (V<sub>BB</sub> − V<sub>BE</sub>) / (R<sub>BB</sub> + (β+1)R<sub>E</sub>)</div>
+<h3>Method</h3><ol><li>Assume active; solve the base loop for I<sub>B</sub>.</li><li>I<sub>C</sub> = βI<sub>B</sub>; collector loop gives V<sub>CE</sub>.</li><li>V<sub>CE</sub> &gt; 0.2 V → active ✓. Otherwise saturation: set V<sub>CE</sub> = 0.2 V, solve both loops together, confirm I<sub>C</sub> &lt; βI<sub>B</sub>.</li></ol>`,
+mosfet:`<h3>NMOS (enhancement)</h3>
+<div class="math">I<sub>G</sub> = 0  →  V<sub>G</sub> = V<sub>DD</sub>·R₂/(R₁+R₂)
+V<sub>ov</sub> = V<sub>GS</sub> − V<sub>t</sub>
+k<sub>n</sub> = µ<sub>n</sub>C<sub>ox</sub>(W/L)</div>
+<h3>Regions of operation</h3>
+<table class="pt"><tr><th>Region</th><th>Conditions</th><th>I<sub>D</sub></th></tr>
+<tr><td>Cutoff</td><td>V<sub>GS</sub> &lt; V<sub>t</sub></td><td>0</td></tr>
+<tr><td>Triode</td><td>V<sub>GS</sub> ≥ V<sub>t</sub>, V<sub>DS</sub> &lt; V<sub>GS</sub> − V<sub>t</sub></td><td>k<sub>n</sub>[(V<sub>GS</sub>−V<sub>t</sub>)V<sub>DS</sub> − ½V<sub>DS</sub>²]</td></tr>
+<tr><td>Saturation</td><td>V<sub>GS</sub> ≥ V<sub>t</sub>, V<sub>DS</sub> ≥ V<sub>GS</sub> − V<sub>t</sub></td><td>½k<sub>n</sub>(V<sub>GS</sub> − V<sub>t</sub>)²</td></tr></table>
+<p class="note">If your notes write I<sub>D</sub> = K(V<sub>GS</sub> − V<sub>t</sub>)², then K = ½k<sub>n</sub>. λ = 0 throughout.</p>
+<h3>Loop equations (KVL)</h3>
+<div class="math">Gate:   V<sub>GS</sub> = V<sub>G</sub> − I<sub>D</sub>R<sub>S</sub>
+Output: V<sub>DS</sub> = V<sub>DD</sub> − I<sub>D</sub>(R<sub>D</sub> + R<sub>S</sub>)</div>
+<h3>Method</h3><ol><li>Find V<sub>G</sub>. If V<sub>GS</sub> can't reach V<sub>t</sub> → cutoff.</li><li>Assume saturation; with R<sub>S</sub> you get a quadratic in V<sub>ov</sub> (keep the positive root).</li><li>Check V<sub>DS</sub> ≥ V<sub>ov</sub>. If not → triode: solve with the triode equation and re-check.</li></ol>`
+};
+
+Object.assign(SHEETS,{
+units:`<h3>Base units</h3><table class="pt"><tr><td>Voltage</td><td>volt, V</td></tr><tr><td>Current</td><td>ampere, A</td></tr><tr><td>Resistance</td><td>ohm, Ω</td></tr><tr><td>Power</td><td>watt, W</td></tr><tr><td>Capacitance</td><td>farad, F</td></tr><tr><td>Frequency</td><td>hertz, Hz</td></tr></table>
+<h3>Metric prefixes</h3>${PREFIX_TBL}
+<h3>Always work in three steps</h3><ol><li><b>Prefix → base:</b> multiply by the factor.<br>4.7 kΩ = 4.7 × 10<sup>3</sup> = 4700 Ω</li><li><b>Calculate</b> with base-unit numbers only. The answer comes out in A, V, Ω or W.</li><li><b>Base → prefix:</b> divide by the factor.<br>0.0025 A ÷ 10<sup>−3</sup> = 2.5 mA</li></ol>
+<h3>Formulas</h3><div class="math">V = I × R     I = V / R
+P = V × I     P = I²R     P = V²/R</div>`,
+bjt:`<h3>NPN currents</h3>
+<div class="math">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>
+I<sub>C</sub> = β·I<sub>B</sub>
+I<sub>E</sub> = (β + 1)·I<sub>B</sub>
+V<sub>BE</sub> = 0.7 V</div>
+<h3>Mode of operation (NPN)</h3>
+<table class="pt"><tr><th>Mode</th><th>Conditions</th></tr>
+<tr><td>Cutoff</td><td>V<sub>BE</sub> &lt; 0.5 V → I<sub>B</sub> = I<sub>C</sub> = 0</td></tr>
+<tr><td>Active</td><td>V<sub>BE</sub> &gt; 0.5 V and V<sub>CE</sub> &gt; 0.2 V</td></tr>
+<tr><td>Saturation</td><td>V<sub>BE</sub> &gt; 0.5 V and V<sub>CE</sub> ≤ 0.2 V<br>(real V<sub>CE</sub> = 0.2 V, I<sub>C</sub> &lt; βI<sub>B</sub>)</td></tr></table>
+<h3>Base resistor with V<sub>BB</sub></h3>
+<div class="math">Loop 1: −V<sub>BB</sub> + I<sub>B</sub>·R<sub>B</sub> + V<sub>BE</sub> = 0
+        I<sub>B</sub> = (V<sub>BB</sub> − V<sub>BE</sub>) / R<sub>B</sub>
+Loop 2: −V<sub>CC</sub> + I<sub>C</sub>·R<sub>C</sub> + V<sub>CE</sub> = 0
+        V<sub>CE</sub> = V<sub>CC</sub> − I<sub>C</sub>·R<sub>C</sub></div>
+<h3>Voltage-divider biasing</h3><p class="note" style="font-style:normal">R₂ is the top resistor (to V<sub>CC</sub>), R₁ the bottom (to ground).</p>
+<div class="math">R<sub>th</sub> = R₁R₂/(R₁ + R₂) = R₁ ∥ R₂
+V<sub>th</sub> = V<sub>CC</sub>·R₁/(R₁ + R₂)
+Loop 1: −V<sub>th</sub> + I<sub>B</sub>·R<sub>th</sub> + V<sub>BE</sub> + I<sub>E</sub>·R<sub>E</sub> = 0
+        I<sub>B</sub> = (V<sub>th</sub> − V<sub>BE</sub>) / (R<sub>th</sub> + (β+1)R<sub>E</sub>)
+Loop 2: −V<sub>CC</sub> + I<sub>C</sub>·R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub>·R<sub>E</sub> = 0
+        V<sub>CE</sub> = V<sub>CC</sub> − I<sub>C</sub>R<sub>C</sub> − I<sub>E</sub>R<sub>E</sub></div>
+<h3>Steps</h3><ol><li>(Divider) voltage division → R<sub>th</sub>, V<sub>th</sub>; re-sketch.</li><li>Loop 1 (KVL) → I<sub>B</sub>.</li><li>Deduce I<sub>C</sub> = βI<sub>B</sub>, I<sub>E</sub> = (β+1)I<sub>B</sub>.</li><li>Loop 2 (KVL) → V<sub>CE</sub>.</li><li>Compare V<sub>BE</sub> and V<sub>CE</sub> → mode.</li></ol>`,
+mosfet:`<h3>Currents and voltages</h3>
+<div class="math">i<sub>G</sub> = 0        i<sub>D</sub> = i<sub>S</sub>
+V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub>   V<sub>DS</sub> = V<sub>D</sub> − V<sub>S</sub>
+V<sub>DS</sub> = V<sub>DG</sub> + V<sub>GS</sub>
+V<sub>ov</sub> = V<sub>GS</sub> − V<sub>th</sub></div>
+<h3>Regions (NMOS)</h3>
+<table class="pt"><tr><th>Region</th><th>Conditions</th><th>i<sub>D</sub></th></tr>
+<tr><td>Cut off</td><td>V<sub>GS</sub> &lt; V<sub>th</sub></td><td>0 A</td></tr>
+<tr><td>Triode</td><td>V<sub>GS</sub> &gt; V<sub>th</sub><br>V<sub>DS</sub> &lt; V<sub>ov</sub></td><td>k′<sub>n</sub>(W/L)[V<sub>ov</sub>·V<sub>DS</sub> − ½V<sub>DS</sub>²]</td></tr>
+<tr><td>Saturation</td><td>V<sub>GS</sub> &gt; V<sub>th</sub><br>V<sub>DS</sub> &gt; V<sub>ov</sub></td><td>½k′<sub>n</sub>(W/L)V<sub>ov</sub>²</td></tr>
+<tr><td>Edge of sat.</td><td>V<sub>GS</sub> &gt; V<sub>th</sub><br>V<sub>DS</sub> = V<sub>ov</sub></td><td>½k′<sub>n</sub>(W/L)V<sub>ov</sub>²</td></tr></table>
+<h3>Circuit relations</h3>
+<div class="math">Divider:  V<sub>G</sub> = V<sub>DD</sub>·R<sub>G2</sub>/(R<sub>G1</sub> + R<sub>G2</sub>)
+Drain:    I<sub>D</sub> = (V<sub>DD</sub> − V<sub>D</sub>) / R<sub>D</sub>
+Source:   I<sub>D</sub> = (V<sub>S</sub> − V<sub>SS</sub>) / R<sub>S</sub>
+Given I<sub>D</sub> in sat: V<sub>ov</sub> = √(2I<sub>D</sub> / (k′<sub>n</sub>·W/L))</div>
+<h3>Steps</h3><ol><li>Find the node voltages V<sub>G</sub>, V<sub>D</sub>, V<sub>S</sub> (divider, Ohm's law, or from the sketch).</li><li>Deduce V<sub>GS</sub>, V<sub>DS</sub> and V<sub>ov</sub>.</li><li>Compare: V<sub>GS</sub> vs V<sub>th</sub>, then V<sub>DS</sub> vs V<sub>ov</sub> → region.</li><li>Use that region's i<sub>D</sub> equation.</li></ol>
+<p class="note">Convert k′<sub>n</sub> to A/V² and W, L to metres before substituting.</p>`
+});
+/* ============ sections ============ */
+const SECTIONS={
+  units:{n:'0',title:'Unit prefixes',short:'Units',gen:genUnits,counts:[5,10,15],def:10,mins:'~1–3 min each',
+    blurb:'Warm-up: convert to and from base units (A, V, Ω, W), then convert → calculate → reconvert.',
+    what:['Prefix → base unit (4.7 kΩ → Ω) and base unit → prefix (0.0025 A → mA)','Multi-step questions: convert every given to base units, apply a formula (Ohm\'s law, power), then express the answer with a new prefix','Each step is checked separately, so you can see exactly where a conversion went wrong']},
+  mesh:{n:'1',title:'Mesh analysis',short:'Mesh',gen:genMesh,counts:[2,3,5],def:3,mins:'~6 min each',
+    blurb:'Two-loop circuits with randomly flipped source polarities. Write the mesh equations, then solve.',
+    what:['Two meshes: R₁ left, R₂ shared, R₃ right, a source on each side','Source polarities flip randomly — signs are the point','Fill in both KVL equations slot by slot, then solve for I₁, I₂ and the R₂ current','Values mix V/kV and Ω/kΩ/MΩ; answers asked in A, mA or µA']},
+  bjt:{n:'2',title:'BJT DC analysis',short:'BJT',gen:genBJT,counts:[2,3,5],def:3,mins:'~5 min each',
+    blurb:'NPN bias circuits solved the lecture way: Loop 1 for I<sub>B</sub>, Loop 2 for V<sub>CE</sub>, then compare to find the mode.',
+    what:['NPN only, DC analysis (AC comes later)','V<sub>BB</sub> + R<sub>B</sub> circuits, voltage-divider common emitter, and common collector','Steps: voltage division (R<sub>th</sub>, V<sub>th</sub>) → Loop 1 → I<sub>C</sub>, I<sub>E</sub> → Loop 2 → mode','About a third of questions turn out saturated: check V<sub>CE</sub> against 0.2 V']},
+  mosfet:{n:'3',title:'MOSFET DC analysis',short:'MOSFET',gen:genMOS,counts:[2,3,5],def:3,mins:'~5 min each',
+    blurb:'NMOS circuits solved the lecture way: node voltages → V<sub>GS</sub>, V<sub>DS</sub>, V<sub>ov</sub> → compare to find the region → i<sub>D</sub>.',
+    what:['NMOS only, DC analysis','Given terminal voltages: find V<sub>ov</sub>, region (cutoff / triode / saturation / edge) and I<sub>D</sub>','Edge of saturation, dual-supply design (find R<sub>D</sub>, R<sub>S</sub>), diode-connected NMOS','Common source and common drain with a gate divider and given I<sub>D</sub>']}
+};
+const ORDER=['units','mesh','bjt','mosfet'];
+
+/* ============ state ============ */
+const app=document.getElementById('app');
+const sessions={};const introOpts={};let sideTab='sheet',sheetOpen=false;
+const graded=q=>q.fields.filter(f=>f.type!=='h');
+const getBest=k=>{try{return JSON.parse(localStorage.getItem('cd-best-'+k)||'null');}catch(e){return null;}};
+const setBest=(k,v)=>{try{localStorage.setItem('cd-best-'+k,JSON.stringify(v));}catch(e){}};
+const mmss=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const elapsed=s=>Math.floor(((s.end||Date.now())-s.start)/1000);
+function clockText(s){if(s.limit){const r=Math.max(0,s.limit-elapsed(s));return `⏱ ${mmss(r)} left`;}return `⏱ ${mmss(elapsed(s))}`;}
+function scoreOf(s){let e=0,m=0;for(const q of s.qs){m+=graded(q).length;e+=q.earned||0;}return [e,m];}
+const route=()=>{const h=location.hash.slice(1);return SECTIONS[h]?h:'home';};
+
+/* ============ grading ============ */
+function evalEq(v,k){
+  let c1=0,c2=0;
+  for(const p of ['a','b']){const n=parseNum(v[`${k}.${p}n`]);if(!isFinite(n))return null;const val=(v[`${k}.${p}s`]==='-'?-1:1)*n*10**(+v[`${k}.${p}u`]);if(v[`${k}.${p}c`]==='1')c1+=val;else c2+=val;}
+  const n=parseNum(v[`${k}.rn`]);if(!isFinite(n))return null;
+  return {c1,c2,b:(v[`${k}.rs`]==='-'?-1:1)*n*10**(+v[`${k}.ru`])};
+}
+function gradeField(f,v){
+  if(f.type==='num'){const x=parseNum(v[f.k]);return isFinite(x)&&close(x,f.ans,f.rel??0.02,f.abs??0);}
+  if(f.type==='sel')return v[f.k]===f.ans;
+  if(f.type==='eq'){const r=evalEq(v,f.k);if(!r)return false;const A=f.ans;
+    return [1,-1].some(g=>close(r.c1,g*A.c1,0.015)&&close(r.c2,g*A.c2,0.015)&&close(r.b,g*A.b,0.015));}
+  return false;
+}
+function gradeQ(q){const res={};let n=0;for(const f of graded(q)){const ok=gradeField(f,q.vals);res[f.k]=ok;if(ok)n++;}return [res,n];}
+
+/* ============ rendering ============ */
+function navHTML(){const r=route();return `<a href="#" class="${r==='home'?'on':''}">Home</a>`+ORDER.map(k=>`<a href="#${k}" class="${r===k?'on':''}"><span class="n">${SECTIONS[k].n}</span>${SECTIONS[k].short}</a>`).join('');}
+function render(){
+  if(!document.querySelector('.q-layout')||route()==='home')document.body.classList.remove('sheet-open');
+  document.getElementById('nav').innerHTML=navHTML();
+  const r=route();
+  if(r==='home')return renderHome();
+  const s=sessions[r];
+  if(!s)return renderIntro(r);
+  if(s.done)return renderSummary(s);
+  renderQuestion(s);
+}
+function renderHome(){
+  app.innerHTML=`<section class="hero"><div class="eyebrow">ECE · Years 1–2 · DC circuit analysis</div>
+<h1>Practice until the signs stop tricking you.</h1>
+<p class="lede">Timed practice tests with new values every attempt. Every question has a formula sheet beside it, hints you can open while you work, and a full worked solution once you check.</p></section>
+<div class="grid">${ORDER.map(k=>{const S=SECTIONS[k],b=getBest(k);return `<a class="sec-card" href="#${k}"><div class="num">${S.n.padStart(2,'0')}</div><h3>${S.title}</h3><p>${S.blurb}</p><div class="meta"><span>${S.mins}</span>${b?`<span>best <b>${b.pct}%</b></span>`:'<span>not tried yet</span>'}</div></a>`;}).join('')}</div>
+<p class="foot">Suggested order: start with unit prefixes. Every later section mixes Ω, kΩ and MΩ, V and kV, and asks for answers in A, mA or µA.</p>`;
+}
+function renderIntro(k){
+  const S=SECTIONS[k];const o=introOpts[k]||(introOpts[k]={count:S.def,limit:0});const b=getBest(k);
+  const others=ORDER.filter(x=>x!==k&&sessions[x]&&!sessions[x].done);
+  app.innerHTML=`<div class="layout"><section class="card intro">
+<div class="eyebrow">Section ${S.n}</div><h1>${S.title}</h1><p class="lede">${S.blurb}</p>
+<ul class="what">${S.what.map(w=>`<li>${w}</li>`).join('')}</ul>
+<div class="opt"><span class="ol">Questions</span><span class="seg" data-o="count">${S.counts.map(c=>`<button class="${o.count===c?'on':''}" data-v="${c}">${c}</button>`).join('')}</span></div>
+<div class="opt"><span class="ol">Time limit</span><span class="seg" data-o="limit">${[0,5,10,15,20,30].map(c=>`<button class="${o.limit===c?'on':''}" data-v="${c}">${c?c+' min':'Off'}</button>`).join('')}</span></div>
+<div class="actions"><button class="btn primary" id="startBtn">Start test →</button></div>
+${b?`<div class="best">Best so far: ${b.score}/${b.max} (${b.pct}%) in ${mmss(b.time)}</div>`:''}
+${others.length?`<div class="warnbox">You have a test in progress in ${others.map(x=>`<a href="#${x}">${SECTIONS[x].title}</a>`).join(', ')}. It keeps running in the background.</div>`:''}
+</section><aside class="side"><div class="tabs"><button class="on">Formula sheet</button></div><div class="panel">${SHEETS[k]}</div></aside></div>`;
+  app.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const bt=e.target.closest('button');if(!bt)return;o[seg.dataset.o]=+bt.dataset.v;renderIntro(k);}));
+  document.getElementById('startBtn').onclick=()=>{
+    const qs=[];for(let i=0;i<o.count;i++){const q=S.gen();q.vals={};q.hintsShown=0;q.scored=false;q.earned=0;qs.push(q);}
+    sessions[k]={sec:k,qs,idx:0,start:Date.now(),limit:o.limit*60,hints:0,done:false};sideTab='sheet';render();window.scrollTo(0,0);
+  };
+}
+function fieldHTML(f){
+  if(f.type==='h')return `<div class="part-h">${f.text}</div>`;
+  if(f.type==='num')return `<div class="field" data-f="${f.k}"><label>${f.label}</label><div class="inrow"><input type="text" data-k="${f.k}" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="value"><span class="u">${f.unit}</span></div><div class="mk"></div></div>`;
+  if(f.type==='sel')return `<div class="field" data-f="${f.k}"><label>${f.label}</label><div class="inrow"><select data-k="${f.k}"><option value="">choose…</option>${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></div><div class="mk"></div></div>`;
+  const k=f.k;
+  const ru=[[0,'Ω'],[3,'kΩ'],[6,'MΩ']];
+  const sign=key=>`<select data-k="${key}" aria-label="sign"><option value="+">+</option><option value="-">−</option></select>`;
+  const term=(p,cur)=>`<span class="term">${sign(`${k}.${p}s`)}<input type="text" data-k="${k}.${p}n" inputmode="decimal" autocomplete="off" placeholder="R" aria-label="resistance"><select data-k="${k}.${p}u" aria-label="unit">${ru.map(([e,t])=>`<option value="${e}"${e===f.rdef?' selected':''}>${t}</option>`).join('')}</select><span class="dotop">·</span><select data-k="${k}.${p}c" aria-label="mesh current"><option value="1"${cur===1?' selected':''}>I₁</option><option value="2"${cur===2?' selected':''}>I₂</option></select></span>`;
+  return `<div class="field eq" data-f="${k}"><label>${f.label}</label><div class="eqrow">${term('a',1)}${term('b',2)}<span class="eqs">=</span><span class="term">${sign(`${k}.rs`)}<input type="text" data-k="${k}.rn" inputmode="decimal" autocomplete="off" placeholder="V" aria-label="voltage"><select data-k="${k}.ru" aria-label="unit"><option value="0">V</option><option value="3">kV</option><option value="-3">mV</option></select></span></div><div class="mk"></div></div>`;
+}
+function hintsHTML(s,q){
+  const n=q.hints.length,shown=q.hints.slice(0,q.hintsShown);
+  return (shown.length?shown.map((h,i)=>`<div class="hint"><span class="hn">HINT ${i+1}</span>${h}</div>`).join(''):`<p style="color:var(--muted);margin-bottom:12px">Stuck? Hints are revealed one at a time, from a nudge to the method. Using hints doesn't change your score, but it's tallied at the end.</p>`)+
+    (q.hintsShown<n?`<button class="btn ghost" id="hintBtn">Reveal hint ${q.hintsShown+1} of ${n}</button>`:`<p class="note">No more hints. Use “Show solution” for the full working.</p>`);
+}
+function renderQuestion(s){
+  const S=SECTIONS[s.sec],q=s.qs[s.idx];const [sc,mx]=scoreOf(s);const last=s.idx===s.qs.length-1;
+  const lowTime=s.limit&&s.limit-elapsed(s)<60;
+  app.innerHTML=`<div class="layout q-layout"><section>
+<div class="bar"><div class="bar-l"><span class="crumb">${S.title}</span><span class="prog">Question ${s.idx+1} of ${s.qs.length}</span></div>
+<div class="bar-r"><span class="stat">Score <b>${sc}</b>/${mx}</span><span class="stat${lowTime?' warn':''}" id="clock">${clockText(s)}</span><button class="btn ghost" id="endBtn" style="padding:5px 11px;font-size:13px">End test</button></div></div>
+<div class="dots">${s.qs.map((qq,i)=>`<span class="${i===s.idx?'cur':qq.scored?(qq.earned===graded(qq).length?'ok':'part'):''}"></span>`).join('')}</div>
+<article class="card">
+<div class="qh"><span class="qn">Q${s.idx+1}</span><span class="qt">${q.kind}</span></div>
+${q.svg?`<div class="diagram">${q.svg}</div><div class="swipe">← swipe the diagram to see all of it →</div>`:''}
+<div class="prompt">${q.prompt}</div>
+<div class="fields">${q.fields.map(fieldHTML).join('')}</div>
+<div class="actions"><button class="btn primary" id="checkBtn">${q.scored?'Check again':'Check answers'}</button><button class="btn ghost" id="solBtn">${q.solShown?'Hide solution':'Show solution'}</button><span class="spacer"></span>
+${s.idx>0?'<button class="btn ghost" id="prevBtn">← Prev</button>':''}<button class="btn ${q.scored||q.solShown?'primary':'ghost'}" id="nextBtn">${last?'Finish test':'Next →'}</button></div>
+<div id="fb">${q.fb||''}</div>
+${q.solShown?`<div class="solution">${q.solution}</div>`:''}
+</article></section>
+<aside class="side"><div class="tabs"><button data-t="sheet" class="${sideTab==='sheet'?'on':''}">Formula sheet</button><button data-t="hints" class="${sideTab==='hints'?'on':''}">Hints<span class="badge">${q.hintsShown}/${q.hints.length}</span></button><button class="sheet-close" id="sheetClose" aria-label="Close">✕</button></div>
+<div class="panel">${sideTab==='sheet'?SHEETS[s.sec]:hintsHTML(s,q)}</div></aside></div>
+<div class="scrim" id="scrim"></div><div class="mob-bar"><button data-open="sheet">Formula sheet</button><button data-open="hints">Hints (${q.hintsShown}/${q.hints.length})</button></div>`;
+  // restore values + marks
+  app.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(q.vals[k]!==undefined)el.value=q.vals[k];else q.vals[k]=el.value;
+    const save=()=>{q.vals[k]=el.value;};el.addEventListener('input',save);el.addEventListener('change',save);
+    if(el.tagName==='INPUT')el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doCheck(s,q);}});});
+  if(q.marks)for(const [k,ok] of Object.entries(q.marks)){const el=app.querySelector(`[data-f="${k}"]`);if(!el)continue;el.classList.add(ok?'ok':'bad');el.querySelector('.mk').textContent=ok?'✓ Correct':'✗ Not quite — check this one';}
+  document.getElementById('checkBtn').onclick=()=>doCheck(s,q);
+  document.getElementById('solBtn').onclick=()=>{if(!q.scored&&!q.solShown){q.scored=true;q.earned=0;q.fb=`<div class="fb info">Solution opened before checking, so this question scores 0. Keep working through it — you can still check your answers for practice.</div>`;}q.solShown=!q.solShown;render();};
+  document.getElementById('nextBtn').onclick=()=>{sheetOpen=false;if(last){finish(s);}else s.idx++;render();window.scrollTo(0,0);};
+  const pb=document.getElementById('prevBtn');if(pb)pb.onclick=()=>{sheetOpen=false;s.idx--;render();window.scrollTo(0,0);};
+  const eb=document.getElementById('endBtn');eb.onclick=()=>{if(eb.dataset.arm){finish(s);render();window.scrollTo(0,0);return;}eb.dataset.arm=1;eb.textContent='Confirm end?';eb.classList.add('danger');setTimeout(()=>{if(document.body.contains(eb)){delete eb.dataset.arm;eb.textContent='End test';eb.classList.remove('danger');}},3000);};
+  app.querySelectorAll('.tabs button[data-t]').forEach(b=>b.onclick=()=>{sideTab=b.dataset.t;render();});
+  app.querySelectorAll('.mob-bar button').forEach(b=>b.onclick=()=>{sideTab=b.dataset.open;sheetOpen=true;render();});
+  const closeSheet=()=>{sheetOpen=false;document.body.classList.remove('sheet-open');};
+  document.getElementById('scrim').onclick=closeSheet;document.getElementById('sheetClose').onclick=closeSheet;
+  document.body.classList.toggle('sheet-open',sheetOpen);
+  const hb=document.getElementById('hintBtn');if(hb)hb.onclick=()=>{q.hintsShown++;s.hints++;render();};
+}
+function doCheck(s,q){
+  const [res,n]=gradeQ(q);const tot=graded(q).length;q.marks=res;
+  if(!q.scored){q.scored=true;q.earned=n;q.fb=n===tot?`<div class="fb ok">All ${tot} parts correct.</div>`:`<div class="fb bad">${n} of ${tot} correct. That's your score for this question — you can keep fixing answers and re-checking for practice, or open the solution.</div>`;}
+  else q.fb=n===tot?`<div class="fb ok">All ${tot} parts correct now. (Score stays at ${q.earned}/${tot} from your first check.)</div>`:`<div class="fb bad">${n} of ${tot} correct. (Score stays at ${q.earned}/${tot} from your first check.)</div>`;
+  render();
+}
+function finish(s){
+  if(s.done)return;
+  for(const q of s.qs){if(!q.scored){const [res,n]=gradeQ(q);q.marks=res;q.earned=n;q.scored=true;}}
+  s.done=true;s.end=Date.now();
+  const [sc,mx]=scoreOf(s);const pct=Math.round(100*sc/mx);const b=getBest(s.sec);
+  s.newBest=!b||pct>b.pct||(pct===b.pct&&elapsed(s)<b.time);
+  if(s.newBest)setBest(s.sec,{score:sc,max:mx,pct,time:elapsed(s)});
+}
+function renderSummary(s){
+  const S=SECTIONS[s.sec];const [sc,mx]=scoreOf(s);const pct=Math.round(100*sc/mx);
+  const timedOut=s.limit&&elapsed(s)>=s.limit;
+  app.innerHTML=`<div class="layout"><section class="card">
+<div class="eyebrow">${S.title} · results</div>
+<div class="big">${pct}%<small> · ${sc}/${mx} parts</small></div>
+<div class="sumstats"><span class="stat">Time ${mmss(Math.min(elapsed(s),s.limit||1e9))}${timedOut?' (time limit reached)':''}</span><span class="stat">Hints used ${s.hints}</span>${s.newBest?'<span class="stat" style="color:var(--good);border-color:var(--good)">New personal best</span>':''}</div>
+${s.qs.map((q,i)=>{const t=graded(q).length;return `<details class="rev"><summary><span class="qn">Q${i+1}</span><span>${q.kind}</span><span class="sc ${q.earned===t?'full':q.earned===0?'zero':''}">${q.earned}/${t}</span></summary>${q.svg?`<div class="diagram" style="margin-top:10px">${q.svg}</div>`:''}<div class="prompt">${q.prompt}</div><div class="solution">${q.solution}</div></details>`;}).join('')}
+<div class="actions"><button class="btn primary" id="againBtn">New test, new values →</button><a class="btn ghost" href="#" style="text-decoration:none">All sections</a></div>
+</section><aside class="side"><div class="tabs"><button class="on">Formula sheet</button></div><div class="panel">${SHEETS[s.sec]}</div></aside></div>`;
+  document.getElementById('againBtn').onclick=()=>{delete sessions[s.sec];render();};
+}
+setInterval(()=>{const r=route(),s=sessions[r];
+  for(const k of ORDER){const x=sessions[k];if(x&&!x.done&&x.limit&&elapsed(x)>=x.limit){finish(x);if(k===r){render();return;}}}
+  if(!s||s.done)return;const c=document.getElementById('clock');if(c){c.textContent=clockText(s);if(s.limit&&s.limit-elapsed(s)<60)c.classList.add('warn');}
+},1000);
+window.addEventListener('hashchange',()=>{sheetOpen=false;render();window.scrollTo(0,0);});
+render();
+</script>
+</body>
+</html>
